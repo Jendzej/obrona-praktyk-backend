@@ -5,3 +5,9 @@ Backend projektu, połączony z bazą danych, stworzony przy użyciu języka pro
 
 - FastAPI,
 - SQLAlchemy
+
+
+## Commands
+```
+pipenv requirements > requirements.txt
+```
