@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 def create_models(engine, base):
     """Creating models in db"""
     item_id_sequence = Sequence('item_id_sequence')
-    # transaction_sequence = Sequence('transaction_sequence')
+    transaction_sequence = Sequence('transaction_sequence')
 
     class Items(base):
         __tablename__ = "items"
@@ -41,7 +41,7 @@ def create_models(engine, base):
 
         def __repr__(self):
             """Creating column in table"""
-            return f"<PaymentStatus(role={self.role})>"
+            return f"<PaymentStatus(status={self.status})>"
 
     class Users(base):
         __tablename__ = "users"
@@ -57,12 +57,14 @@ def create_models(engine, base):
             return f"<Users(username={self.username}, first_name={self.first_name}, last_name={self.last_name}, password={self.password}, role={self.role}, school_class={self.school_class})>"
 
     class Transactions(base):
+        __tablename__ = "transactions"
+        id = Column(Integer, transaction_sequence, primary_key=True, server_default=transaction_sequence.next_value())
         user = Column(String, ForeignKey("users.username"))
         item = Column(String, ForeignKey("items.item_name"))
         payment_status = Column(String, ForeignKey("payment_status.status"))
 
         def __repr__(self):
-            return f"<Transactions(user={self.user}, item={self.item}, payment_status={self.payment_status})>"
+            return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status})>"
 
     base.metadata.create_all(engine)
     return [Items, SchoolClasses, Roles, Users, Transactions, PaymentStatus]
