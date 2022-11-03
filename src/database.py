@@ -39,9 +39,13 @@ class Database:
 
         return "Connected!"
 
-    # @connecting_db
     def create_tables(self, base):
         model_list = create_models(self.engine, base)
+        model_school_classes = model_list[0]
+        model_roles = model_list[1]
+        model_payment_status = model_list[2]
+        initial_models = [model_school_classes, model_roles, model_payment_status]
+
         return model_list
 
     def add_data(self, model):
@@ -86,21 +90,5 @@ users_model = models[3]
 transactions_model = models[4]
 payment_status_model = models[5]
 
-# print(db.add_data(school_class_models(school_class="4TIP")))
-# print(db.add_data(roles(role="admin")))
-
-# print(item_model)
-# print(db.add_data(
-#     users_model(username="jedrzej2115", first_name="jedrzej", last_name="runowicz", password="haslo",
-#                 role="admin",
-#                 school_class="4TIP")))
-
-# db.add_multiple_data([
-#     item_model(item_name="Bułka", item_price=14.23, item_description="Opis bułki", item_image_url="url"),
-#     item_model(item_name="Bagietka", item_price=4.23, item_description="Opis bagietki", item_image_url="url")])
-
-# db.add_data(payment_status_model(status="paid"))
-
-# db.add_data(transactions_model(user="jedrzej2115", item="Bagietka", payment_status="paid"))
-# print(db.fetch_one_last(users_model).transaction_item)
-print(db.fetch_all_data(users_model))
+print(db.fetch_all_data(transactions_model))
+print(db.fetch_all_data(item_model))

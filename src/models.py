@@ -1,4 +1,4 @@
-from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime, Table
+from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
 
@@ -46,6 +46,7 @@ def create_models(engine, base):
     class Users(base):
         __tablename__ = "users"
         username = Column(String(20), primary_key=True)
+        email = Column(String(50), unique=True)
         first_name = Column(String(30))
         last_name = Column(String(30))
         password = Column(String(30))
@@ -54,7 +55,7 @@ def create_models(engine, base):
         transaction_item = relationship('Items', secondary='transactions', backref='transaction_items')
 
         def __repr__(self):
-            return f"<Users(username={self.username}, first_name={self.first_name}, last_name={self.last_name}, password={self.password}, role={self.role}, school_class={self.school_class})>"
+            return f"<Users(username={self.username}, email={self.email}, first_name={self.first_name}, last_name={self.last_name}, password={self.password}, role={self.role}, school_class={self.school_class})>"
 
     class Transactions(base):
         __tablename__ = "transactions"
@@ -67,4 +68,4 @@ def create_models(engine, base):
             return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status})>"
 
     base.metadata.create_all(engine)
-    return [Items, SchoolClasses, Roles, Users, Transactions, PaymentStatus]
+    return [SchoolClasses, Roles, PaymentStatus, Items, Users, Transactions]
