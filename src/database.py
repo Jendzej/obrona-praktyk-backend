@@ -1,7 +1,5 @@
-import os
 import time
 
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
@@ -65,27 +63,3 @@ class Database:
 
     def fetch_all_data(self, model):
         return fetch_all(self.engine, model)
-
-
-load_dotenv()
-
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
-host = os.getenv("POSTGRES_HOST")
-port = os.getenv("POSTGRES_PORT")
-name = os.getenv("POSTGRES_DB")
-
-db = Database(user, password, host, port, name)
-db.connecting_db()
-
-models = db.create_tables(Base)
-
-item_model = models[0]
-school_class_models = models[1]
-roles = models[2]
-users_model = models[3]
-transactions_model = models[4]
-payment_status_model = models[5]
-
-print(db.fetch_all_data(transactions_model))
-print(db.fetch_all_data(item_model))
