@@ -3,6 +3,7 @@ import time
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -46,7 +47,11 @@ class Database:
         model_roles = model_list[1]
         model_payment_status = model_list[2]
         initial_models = [model_school_classes, model_roles, model_payment_status]
-        initial_insertion(self.engine, initial_models)
+        try:
+            initial_insertion(self.engine, initial_models)
+            print("Created databases initial data")
+        except IntegrityError:
+            print("Databases initial data already exists, skipping initialization")
         return model_list
 
     def add_data(self, model):
