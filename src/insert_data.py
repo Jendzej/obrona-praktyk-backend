@@ -1,18 +1,18 @@
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
 
 def add_data(engine, model):
     session = sessionmaker(bind=engine)
     sess = session()
     sess.add(model)
-    sess.commit()
+    try:
+        sess.commit()
+    except IntegrityError:
+        print(IntegrityError)
+        pass
 
 
 def add_multiple_data(engine, models: list):
-    session = sessionmaker(bind=engine)
-    sess = session()
-
     for model in models:
-        sess.add(model)
-
-    sess.commit()
+        add_data(engine, model)

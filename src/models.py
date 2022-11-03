@@ -69,4 +69,4 @@ def create_models(engine, base):
             return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status}, transaction_time={self.transaction_time})>"
 
     base.metadata.create_all(engine)
-    return [SchoolClasses, Roles, PaymentStatus, Items, Users, Transactions]
+    return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions]]
