@@ -1,4 +1,4 @@
-from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 
@@ -63,9 +63,10 @@ def create_models(engine, base):
         user = Column(String, ForeignKey("users.username"))
         item = Column(String, ForeignKey("items.item_name"))
         payment_status = Column(String, ForeignKey("payment_status.status"))
+        transaction_time = Column(DateTime)
 
         def __repr__(self):
-            return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status})>"
+            return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status}, transaction_time={self.transaction_time})>"
 
     base.metadata.create_all(engine)
     return [SchoolClasses, Roles, PaymentStatus, Items, Users, Transactions]
