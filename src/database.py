@@ -99,4 +99,4 @@ payment_status_model = models[5]
 # db.add_data(payment_status_model(status="paid"))
 
 # db.add_data(transactions_model(user="jedrzej2115", item="Bagietka", payment_status="paid"))
-db.fetch_one_last(users_model)
+print(db.fetch_one_last(users_model).transaction_item)
