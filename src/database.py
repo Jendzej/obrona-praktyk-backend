@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from fetch_data import fetch_last, fetch_all
+from initial_db_data import initial_insertion
 from models import create_models
 
 Base = declarative_base()
@@ -45,7 +46,7 @@ class Database:
         model_roles = model_list[1]
         model_payment_status = model_list[2]
         initial_models = [model_school_classes, model_roles, model_payment_status]
-
+        initial_insertion(self.engine, initial_models)
         return model_list
 
     def add_data(self, model):
