@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+from fetch_data import fetch_last
 from models import create_models
 
 Base = declarative_base()
@@ -58,6 +59,9 @@ class Database:
 
         sess.commit()
 
+    def fetch_one_last(self, model):
+        return fetch_last(self.engine, model)
+
 
 load_dotenv()
 
@@ -95,3 +99,4 @@ payment_status_model = models[5]
 # db.add_data(payment_status_model(status="paid"))
 
 # db.add_data(transactions_model(user="jedrzej2115", item="Bagietka", payment_status="paid"))
+db.fetch_one_last(users_model)
