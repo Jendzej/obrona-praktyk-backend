@@ -25,7 +25,7 @@ model_of_user = model_list[1]
 model_of_transaction = model_list[2]
 # user='', item='', payment_status='', transaction_time=datetime.datetime.today()
 
-# print(db.user_update(model_of_user, 'janusz121', {'username': 'jedrzej123'}))
+print(db.user_update(model_of_user, 'jedrzej123', {'username': 'janusz412341242'}))
 # print(db.get_user(model_of_user, 'jedrzej150'))
 # db.add_one_record(
 #     model_of_user(username='janusz121', email='email1', first_name='jan', last_name='Huan', password='Haslo',
