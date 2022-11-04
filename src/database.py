@@ -1,10 +1,12 @@
+import datetime
 import time
-from src.data_insert import insert_transaction
+
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.data_functions import add_data, add_multiple_data, select_user, update_user, select_all_data
+from src.data_insert import insert_transaction, insert_user, group_transaction
 from src.database_start_data import initial_insertion
 from src.fetch_data import fetch_last, fetch_all
 from src.log import logger
@@ -78,8 +80,22 @@ class Database:
     # def fetch_transactions(self, model, username):
     #     select_transaction_items(self.engine, model, username)
 
-    def add_transaction(self, model, user, items, payment_status, transaction_time):
+    def add_transaction(self, model, user, item, payment_status, transaction_time):
         try:
-            insert_transaction(self.engine, model, user, items, payment_status, transaction_time)
+            insert_transaction(self.engine, model, user, item, payment_status, transaction_time)
+        except IntegrityError as IE:
+            logger.error(f"IntegrityError: {IE}")
+
+    def add_user(self, user_model, username: str, email: str, first_name: str, last_name: str, password: str, role: str,
+                 school_class: str):
+        try:
+            insert_user(self.engine, user_model, username, email, first_name, last_name, password, role, school_class)
+        except IntegrityError as IE:
+            logger.error(f"IntegrityError: {IE}")
+
+    def group_transaction(self, transaction_model, gr_transaction_model, item_model, user: str,
+                          transaction_time: datetime):
+        try:
+            group_transaction(self.engine, transaction_model, gr_transaction_model, item_model, user, transaction_time)
         except IntegrityError as IE:
             logger.error(f"IntegrityError: {IE}")

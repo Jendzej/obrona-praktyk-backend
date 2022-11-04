@@ -1,5 +1,4 @@
 from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
-from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
 
@@ -7,6 +6,7 @@ def create_models(engine, base):
     """Creating models in db"""
     item_id_sequence = Sequence('item_id_sequence')
     transaction_sequence = Sequence('transaction_sequence')
+    gr_transaction_sequence = Sequence('gr_transaction_sequence')
     user_id_sequence = Sequence('user_id_sequence')
 
     class Items(base):
@@ -71,5 +71,18 @@ def create_models(engine, base):
         def __repr__(self):
             return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status}, transaction_time={self.transaction_time})>"
 
+    class GroupedTransactions(base):
+        __tablename__ = "grouped_transactions"
+        id = Column(Integer, gr_transaction_sequence, primary_key=True,
+                    server_default=gr_transaction_sequence.next_value())
+        user = Column(String(20), ForeignKey('users.username'))
+        # items = Column(MutableList.as_mutable(String))
+        items = Column(String)
+        items_value = Column(Float)
+        transaction_time = Column(DateTime)
+
+        def __repr__(self):
+            return f"<GroupedTransactions(id={self.id}, user={self.user}, items={self.items}, items_value={self.items_value}, transaction_time={self.transaction_time})>"
+
     base.metadata.create_all(engine)
-    return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions]]
+    return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions, GroupedTransactions]]

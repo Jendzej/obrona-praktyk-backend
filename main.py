@@ -1,14 +1,16 @@
 import datetime
 import os
+
 from dotenv import load_dotenv
-# from fastapi import FastAPI
+from fastapi import FastAPI
 from sqlalchemy.ext.declarative import declarative_base
+
 from src.database import Database
 
 load_dotenv()
 Base = declarative_base()
 
-# app = FastAPI()
+app = FastAPI()
 
 db = Database(os.getenv("POSTGRES_USER"), os.getenv("POSTGRES_PASSWORD"), os.getenv("POSTGRES_HOST"),
               os.getenv("POSTGRES_PORT"), os.getenv("POSTGRES_DB"))
@@ -23,6 +25,8 @@ model_of_user = model_list[1]
 
 model_of_transaction = model_list[2]
 # user='', item='', payment_status='', transaction_time=datetime.datetime.today()
+
+model_of_gr_transaction = model_list[3]
 
 '''
 db.add_one_record(
@@ -39,13 +43,31 @@ db.add_multiple_records([
 ])
 '''
 # db.fetch_transactions(model_of_transaction, '')
-'''
+''''''
+time_tr = datetime.datetime.today()
 db.add_multiple_records([
-    model_of_transaction(user='jedrzej1', item='item1', payment_status='paid',
-                         transaction_time=datetime.datetime.today()),
-    model_of_transaction(user='jedrzej1', item='item2', payment_status='paid',
-                         transaction_time=datetime.datetime.today()),
-    model_of_transaction(user='jedrzej1', item='item3', payment_status='paid',
-                         transaction_time=datetime.datetime.today())
+    model_of_transaction(user='JohnyTest', item='item1', payment_status='paid',
+                         transaction_time=time_tr),
+    model_of_transaction(user='JohnyTest', item='item2', payment_status='paid',
+                         transaction_time=time_tr),
+    model_of_transaction(user='JohnyTest', item='item3', payment_status='paid',
+                         transaction_time=time_tr)
 ])
-'''
+
+# db.add_transaction(model_of_transaction, 'JohnyTest', 'item2', 'paid', datetime.datetime.today())
+
+db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, 'JohnyTest',
+                     datetime.datetime.today())
+
+
+@app.post('/add_transaction')
+async def add_item_to_transaction(body: dict):
+    # user, items: list, payment_status
+    user: str = body['user']
+    items: list = body['items']
+    payment_status: str = body['payment_status']
+    transaction_time: datetime = datetime.datetime.today()
+    for item in items:
+        db.add_one_record(model_of_transaction(user=user, item=item, payment_status=payment_status,
+                                               transaction_time=transaction_time))
+    db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, user, transaction_time)
