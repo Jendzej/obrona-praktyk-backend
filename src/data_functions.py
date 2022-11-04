@@ -22,6 +22,13 @@ def add_multiple_data(engine, models: list):
         add_data(engine, model)
 
 
+def select_all_data(engine, model):
+    session = sessionmaker(bind=engine)
+    sess = session()
+    data = sess.query(model).all()
+    return data
+
+
 def select_user(engine, model, username):
     session = sessionmaker(bind=engine)
     sess = session()

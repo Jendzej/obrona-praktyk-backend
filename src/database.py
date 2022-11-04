@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.data_functions import add_data, add_multiple_data, select_user, update_user
+from src.data_functions import add_data, add_multiple_data, select_user, update_user, select_all_data
 from src.fetch_data import fetch_last, fetch_all
 from src.initial_db_data import initial_insertion
 from src.log import logger
@@ -68,6 +68,9 @@ class Database:
 
     def get_user(self, model, username):
         return select_user(self.engine, model, username)
+
+    def get_table_data(self, model):
+        return select_all_data(self.engine, model)
 
     def user_update(self, user_model, username, new_user_data: dict):
         return update_user(self.engine, user_model, username, new_user_data)
