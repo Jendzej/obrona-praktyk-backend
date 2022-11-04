@@ -5,8 +5,8 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.data_functions import add_data, add_multiple_data, select_user, update_user, select_all_data
+from src.database_start_data import initial_insertion
 from src.fetch_data import fetch_last, fetch_all
-from src.initial_db_data import initial_insertion
 from src.log import logger
 from src.models import create_models
 
