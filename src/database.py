@@ -1,5 +1,5 @@
 import time
-
+from src.data_insert import insert_transation
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
@@ -75,5 +75,11 @@ class Database:
     def user_update(self, user_model, username, new_user_data: dict):
         return update_user(self.engine, user_model, username, new_user_data)
 
-    def fetch_transactions(self, model, username):
-        select_transaction_items(self.engine, model, username)
+    # def fetch_transactions(self, model, username):
+    #     select_transaction_items(self.engine, model, username)
+
+    def add_transaction(self, model, user, items, payment_status, transaction_time):
+        try:
+            insert_transation(self.engine, model, user, items, payment_status, transaction_time)
+        except IntegrityError as IE:
+            logger.error(f"IntegrityError: {IE}")

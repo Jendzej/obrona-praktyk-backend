@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 # from fastapi import FastAPI
 from sqlalchemy.ext.declarative import declarative_base
-
 from src.database import Database
 
 load_dotenv()

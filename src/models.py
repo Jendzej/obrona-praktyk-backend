@@ -1,4 +1,5 @@
 from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import relationship
 
 
