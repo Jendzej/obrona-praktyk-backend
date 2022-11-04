@@ -4,10 +4,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
-from fetch_data import fetch_last, fetch_all
-from initial_db_data import initial_insertion
-from insert_data import add_data, add_multiple_data
-from models import create_models
+from src.fetch_data import fetch_last, fetch_all
+from src.initial_db_data import initial_insertion
+from src.insert_data import add_data, add_multiple_data
+from src.log import logger
+from src.models import create_models
 
 Base = declarative_base()
 
@@ -26,17 +27,18 @@ class Database:
         self.engine = engine(db_user, db_password, db_host, db_port, db_name)
 
     def connecting_db(self):
+        logger.info("Connecting to database ...")
         while True:
             try:
                 self.engine.connect()
                 break
             except OperationalError as OpErr:
-                print("Trying again ...")
-                print(OpErr)
+                logger.debug(OpErr)
+                logger.info("Trying again...")
                 time.sleep(2)
                 continue
 
-        return "Connected!"
+        return logger.info("Connected")
 
     def create_tables(self, base):
         model_list = create_models(self.engine, base)
@@ -47,9 +49,9 @@ class Database:
 
         try:
             initial_insertion(self.engine, initial_models)
-            print("Inserted databases initial data")
-        except IntegrityError:
-            print("Databases initial data already exists, skipping initialization")
+            logger.info("Inserted database start data")
+        except IntegrityError as IE:
+            logger.info("Database start data already exists, skipping insertion")
         return model_list[1]
 
     def add_one_record(self, model):

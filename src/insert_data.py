@@ -1,5 +1,7 @@
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker
+
+from src.log import logger
 
 
 def add_data(engine, model):
@@ -7,10 +9,12 @@ def add_data(engine, model):
     sess = session()
     sess.add(model)
     try:
+        logger.info(f"Adding data to database...")
         sess.commit()
-    except IntegrityError:
-        print(IntegrityError)
-        pass
+        logger.debug(f"Successfully added data - {model}")
+    except IntegrityError as IE:
+        logger.debug(IE)
+        raise IE
 
 
 def add_multiple_data(engine, models: list):
