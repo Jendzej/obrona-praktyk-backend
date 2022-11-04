@@ -25,6 +25,5 @@ model_of_user = model_list[1]
 model_of_transaction = model_list[2]
 # user='', item='', payment_status='', transaction_time=datetime.datetime.today()
 
-db.add_one_record(model_of_item(item_name='Bagietka czosnkowa', item_price='3.5',
-                                item_description='Bagietka upieczona z masłem ziołowo czosnkowym w środku',
-                                item_image_url='url2'))
+# print(db.user_update(model_of_user, 'jedrzej150', {'first_name': 'nowe_imie2'}))
+# print(db.get_user(model_of_user, 'jedrzej150'))

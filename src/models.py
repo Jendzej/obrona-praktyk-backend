@@ -6,6 +6,7 @@ def create_models(engine, base):
     """Creating models in db"""
     item_id_sequence = Sequence('item_id_sequence')
     transaction_sequence = Sequence('transaction_sequence')
+    user_id_sequence = Sequence('user_id_sequence')
 
     class Items(base):
         __tablename__ = "items"
@@ -45,6 +46,7 @@ def create_models(engine, base):
 
     class Users(base):
         __tablename__ = "users"
+        id = Column(Integer, user_id_sequence, server_default=user_id_sequence.next_value())
         username = Column(String(20), primary_key=True)
         email = Column(String(50), unique=True)
         first_name = Column(String(30))

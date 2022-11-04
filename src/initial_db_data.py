@@ -1,4 +1,4 @@
-from src.insert_data import add_multiple_data
+from src.data_functions import add_multiple_data
 
 
 def initial_insertion(engine, initial_models):
