@@ -37,3 +37,5 @@ print(db.user_update(model_of_user, 'jedrzej123', {'username': 'janusz412341242'
 #     model_of_user(username='kubaPunk', email='email3', first_name='Kuba', last_name='Punk', password='Haslo',
 #                   role='user', school_class='1TR'))
 # print(db.get_table_data(model_of_user))
+
+# TEKST Z INTERNETOWEJ WERSJI
