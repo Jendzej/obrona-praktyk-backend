@@ -74,3 +74,6 @@ class Database:
 
     def user_update(self, user_model, username, new_user_data: dict):
         return update_user(self.engine, user_model, username, new_user_data)
+
+    def fetch_transactions(self, model, username):
+        select_transaction_items(self.engine, model, username)

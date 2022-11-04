@@ -30,6 +30,7 @@ def initial_insertion(engine, initial_models):
 
         model_roles(role="admin"),
         model_roles(role="user"),
+
         model_payment_status(status="paid"),
         model_payment_status(status="not paid"),
         model_payment_status(status="pending"),
