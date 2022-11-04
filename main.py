@@ -36,3 +36,4 @@ model_of_transaction = model_list[2]
 # db.add_one_record(
 #     model_of_user(username='kubaPunk', email='email3', first_name='Kuba', last_name='Punk', password='Haslo',
 #                   role='user', school_class='1TR'))
+print(db.get_table_data(model_of_user))
