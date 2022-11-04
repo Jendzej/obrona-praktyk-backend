@@ -33,13 +33,29 @@ def select_user(engine, model, username):
     session = sessionmaker(bind=engine)
     sess = session()
     data = sess.query(model).filter(model.username == username).all()
-    return data
+    return data[0]
+
+
+def select_item(engine, model, item_name):
+    session = sessionmaker(bind=engine)
+    sess = session()
+    data = sess.query(model).filter(model.item_name == item_name).all()
+    return data[0]
 
 
 def update_user(engine, user_model, username, new_user_data: dict):
     session = sessionmaker(bind=engine)
     sess = session()
     user_to_update = select_user(engine, user_model, username)
-    sess.query(user_model).filter(user_model.id == user_to_update[0].id).update(new_user_data)
+    sess.query(user_model).filter(user_model.id == user_to_update.id).update(new_user_data)
     sess.commit()
-    return sess.query(user_model).filter(user_model.id == user_to_update[0].id).all()
+    return sess.query(user_model).filter(user_model.id == user_to_update.id).all()
+
+
+def update_item(engine, item_model, item_name, new_item_data: dict):
+    session = sessionmaker()
+    sess = session()
+    item_to_update = select_item(engine, item_model, item_name)
+    sess.query(item_model).filter(item_model.id == item_to_update.id).update(new_item_data)
+    sess.commit()
+    return sess.query(item_model).filter(item_model.id == item_to_update.id).all()
