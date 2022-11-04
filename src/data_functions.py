@@ -49,6 +49,13 @@ def select_item(engine, model, item_name):
     return data[0]
 
 
+def select_transaction_items(engine, transaction_model, username):
+    session = sessionmaker(bind=engine)
+    sess = session()
+    transactions = sess.query(transaction_model).filter(transaction_model.user == username).all()
+    return transactions
+
+
 def update_user(engine, user_model, username, new_user_data: dict):
     session = sessionmaker(bind=engine)
     sess = session()
