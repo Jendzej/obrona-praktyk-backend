@@ -76,7 +76,6 @@ def create_models(engine, base):
         id = Column(Integer, gr_transaction_sequence, primary_key=True,
                     server_default=gr_transaction_sequence.next_value())
         user = Column(String(20), ForeignKey('users.username'))
-        # items = Column(MutableList.as_mutable(String))
         items = Column(String)
         items_value = Column(Float)
         transaction_time = Column(DateTime)

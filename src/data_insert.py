@@ -89,15 +89,19 @@ def insert_transaction(engine, transaction_model, user: str, item: str, payment_
 def group_transaction(engine, transaction_model, gr_transaction_model, item_model, user: str,
                       transaction_time: datetime):
     session = create_session(engine)
-    users_transaction = session.query(transaction_model).filter(transaction_model.user == user,
-                                                                transaction_model.transaction_time == transaction_time).all()
+    users_transaction = session.query(transaction_model).filter(transaction_model.user == user).all()
     items_value: float = 0
     items = []
+    times = {}
     for item_in_transaction in users_transaction:
         data = session.query(item_model).filter(
             item_model.item_name == item_in_transaction.item).first().item_price
         items_value += data
         items.append(item_in_transaction.item)
+        if item_in_transaction.transaction_time not in times:
+            times[f'{item_in_transaction.transaction_time}'] = []
+            times[f'{item_in_transaction.transaction_time}'].append(item_in_transaction.item)
+
     print(f"Items: {items}")
     print(f"Type: {type(items)}")
     to_add = gr_transaction_model(
