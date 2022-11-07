@@ -16,7 +16,7 @@ db = Database(os.getenv("POSTGRES_USER"), os.getenv("POSTGRES_PASSWORD"), os.get
               os.getenv("POSTGRES_PORT"), os.getenv("POSTGRES_DB"))
 db.connecting_db()
 
-model_list = db.create_tables(Base)
+model_list = db.init.create_tables(Base)
 model_of_item = model_list[0]
 # item_name='', item_price='', item_description='', item_image_url=''
 
@@ -57,8 +57,8 @@ db.add_multiple_records([
 
 # db.add_transaction(model_of_transaction, 'JohnyTest', 'item2', 'paid', datetime.datetime.today())
 
-db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, 'JohnyTest',
-                     datetime.datetime.today())
+db.insert.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, 'JohnyTest',
+                            datetime.datetime.today())
 
 # db.user_update(model_of_user, 'JohnyTest', {'username': 'JohnyFest'})
 db.update.update_user(model_of_user, 'Jedrzej250', {'username': 'Jedrzej420'})
@@ -72,6 +72,6 @@ async def add_item_to_transaction(body: dict):
     payment_status: str = body['payment_status']
     transaction_time: datetime = datetime.datetime.today()
     for item in items:
-        db.add_one_record(model_of_transaction(user=user, item=item, payment_status=payment_status,
-                                               transaction_time=transaction_time))
-    db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, user, transaction_time)
+        db.insert.transaction(model_of_transaction(user=user, item=item, payment_status=payment_status,
+                                                   transaction_time=transaction_time))
+    db.insert.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, user, transaction_time)

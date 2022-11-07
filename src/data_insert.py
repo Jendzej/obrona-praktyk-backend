@@ -15,7 +15,7 @@ class Insert:
         session = sessionmaker(bind=self.engine)
         return session()
 
-    def add_data(self, model):
+    def data(self, model):
         session = self.create_session()
         try:
             logger.info(f"Adding data to database...")
@@ -25,11 +25,11 @@ class Insert:
             # logger.debug(IE)
             raise IE
 
-    def add_multiple_data(self, models: list):
+    def multiple_data(self, models: list):
         for model in models:
-            self.add_data(model)
+            self.data(model)
 
-    def insert_item(self, item_model, item_name: str, item_price: float, item_description: str, item_image_url: str):
+    def item(self, item_model, item_name: str, item_price: float, item_description: str, item_image_url: str):
         session = self.create_session()
         to_add = item_model(
             item_name=item_name,
@@ -45,8 +45,8 @@ class Insert:
         except IntegrityError as IE:
             raise IE
 
-    def insert_user(self, user_model, username: str, email: str, first_name: str, last_name: str, password: str,
-                    role: str, school_class: str):
+    def user(self, user_model, username: str, email: str, first_name: str, last_name: str, password: str,
+             role: str, school_class: str):
         session = self.create_session()
         to_add = user_model(
             username=username,
@@ -65,8 +65,8 @@ class Insert:
         except IntegrityError as IE:
             raise IE
 
-    def insert_transaction(self, transaction_model, user: str, item: str, payment_status: str,
-                           transaction_time: datetime):
+    def transaction(self, transaction_model, user: str, item: str, payment_status: str,
+                    transaction_time: datetime):
         session = self.create_session()
         to_add = transaction_model(
             user=user,
