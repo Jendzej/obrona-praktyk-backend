@@ -90,30 +90,30 @@ def group_transaction(engine, transaction_model, gr_transaction_model, item_mode
                       transaction_time: datetime):
     session = create_session(engine)
     users_transaction = session.query(transaction_model).filter(transaction_model.user == user).all()
-    items_value: float = 0
-    items = []
+    users_transaction.reverse()
     times = {}
     for item_in_transaction in users_transaction:
-        data = session.query(item_model).filter(
-            item_model.item_name == item_in_transaction.item).first().item_price
-        items_value += data
-        items.append(item_in_transaction.item)
-        if item_in_transaction.transaction_time not in times:
+        try:
+            times[f'{item_in_transaction.transaction_time}'].append(item_in_transaction.item)
+        except KeyError:
             times[f'{item_in_transaction.transaction_time}'] = []
             times[f'{item_in_transaction.transaction_time}'].append(item_in_transaction.item)
 
-    print(f"Items: {items}")
-    print(f"Type: {type(items)}")
-    to_add = gr_transaction_model(
-        user=user,
-        items=MutableList.as_mutable(items),
-        items_value=items_value,
-        transaction_time=transaction_time
-    )
-    session.add(to_add)
-    try:
-        logger.info(f"Adding data to database...")
-        session.commit()
-        logger.debug(f"Successfully added data - {to_add}")
-    except IntegrityError as IE:
-        raise IE
+    for key in times:
+        session.rollback()
+        items_value: float = 0
+        for data in times[key]:
+            items_value += session.query(item_model).filter(item_model.item_name == data).first().item_price
+        to_add = gr_transaction_model(
+            user=user,
+            items=MutableList.as_mutable(times[key]),
+            items_value=items_value,
+            transaction_time=key
+        )
+        session.add(to_add)
+        try:
+            logger.info(f"Grouping transactions...")
+            session.commit()
+            logger.debug(f"Successfully added data - {to_add}")
+        except IntegrityError as IE:
+            raise IE

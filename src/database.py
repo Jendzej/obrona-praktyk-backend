@@ -97,5 +97,5 @@ class Database:
                           transaction_time: datetime):
         try:
             group_transaction(self.engine, transaction_model, gr_transaction_model, item_model, user, transaction_time)
-        except IntegrityError as IE:
-            logger.error(f"IntegrityError: {IE}")
+        except IntegrityError:
+            logger.info("All transactions are already grouped!")

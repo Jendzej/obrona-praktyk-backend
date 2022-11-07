@@ -27,7 +27,6 @@ model_of_transaction = model_list[2]
 # user='', item='', payment_status='', transaction_time=datetime.datetime.today()
 
 model_of_gr_transaction = model_list[3]
-
 '''
 db.add_one_record(
     model_of_user(username='JohnyTest', email='email3', first_name='Johny', last_name='Test', password='password',
@@ -44,6 +43,7 @@ db.add_multiple_records([
 '''
 # db.fetch_transactions(model_of_transaction, '')
 ''''''
+
 time_tr = datetime.datetime.today()
 db.add_multiple_records([
     model_of_transaction(user='JohnyTest', item='item1', payment_status='paid',

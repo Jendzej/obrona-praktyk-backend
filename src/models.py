@@ -78,7 +78,7 @@ def create_models(engine, base):
         user = Column(String(20), ForeignKey('users.username'))
         items = Column(String)
         items_value = Column(Float)
-        transaction_time = Column(DateTime)
+        transaction_time = Column(DateTime, unique=True)
 
         def __repr__(self):
             return f"<GroupedTransactions(id={self.id}, user={self.user}, items={self.items}, items_value={self.items_value}, transaction_time={self.transaction_time})>"
