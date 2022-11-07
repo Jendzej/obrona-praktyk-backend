@@ -1,15 +1,14 @@
-import datetime
 import time
 
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.data_functions import add_data, add_multiple_data, select_user, update_user, select_all_data
+from src.data_functions import select_user, select_all_data
 from src.data_insert import Insert
 from src.data_update import Update
 from src.database_start_data import initial_insertion
-from src.fetch_data import fetch_last, fetch_all
+from src.fetch_data import Fetch
 from src.log import logger
 from src.models import create_models
 
@@ -30,6 +29,7 @@ class Database:
         self.engine = engine(db_user, db_password, db_host, db_port, db_name)
         self.update = Update(self.engine)
         self.insert = Insert(self.engine)
+        self.fetch = Fetch(self.engine)
 
     def connecting_db(self):
         logger.info("Connecting to database ...")
@@ -59,46 +59,8 @@ class Database:
             logger.info("Database start data already exists, skipping insertion")
         return model_list[1]
 
-    def add_one_record(self, model):
-        add_data(self.engine, model)
-
-    def add_multiple_records(self, models: list):
-        add_multiple_data(self.engine, models)
-
-    def fetch_one_last(self, model):
-        return fetch_last(self.engine, model)
-
-    def fetch_all_data(self, model):
-        return fetch_all(self.engine, model)
-
     def get_user(self, model, username):
         return select_user(self.engine, model, username)
 
     def get_table_data(self, model):
         return select_all_data(self.engine, model)
-
-    def user_update(self, user_model, username, new_user_data: dict):
-        return update_user(self.engine, user_model, username, new_user_data)
-
-    # def fetch_transactions(self, model, username):
-    #     select_transaction_items(self.engine, model, username)
-
-    def add_transaction(self, model, user, item, payment_status, transaction_time):
-        try:
-            insert_transaction(self.engine, model, user, item, payment_status, transaction_time)
-        except IntegrityError as IE:
-            logger.error(f"IntegrityError: {IE}")
-
-    def add_user(self, user_model, username: str, email: str, first_name: str, last_name: str, password: str, role: str,
-                 school_class: str):
-        try:
-            insert_user(self.engine, user_model, username, email, first_name, last_name, password, role, school_class)
-        except IntegrityError as IE:
-            logger.error(f"IntegrityError: {IE}")
-
-    def group_transaction(self, transaction_model, gr_transaction_model, item_model, user: str,
-                          transaction_time: datetime):
-        try:
-            group_transaction(self.engine, transaction_model, gr_transaction_model, item_model, user, transaction_time)
-        except IntegrityError:
-            logger.info("All transactions are already grouped!")
