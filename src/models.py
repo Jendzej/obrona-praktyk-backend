@@ -53,8 +53,8 @@ def create_models(engine, base):
         first_name = Column(String(30))
         last_name = Column(String(30))
         password = Column(String(30))
-        role = Column(String, ForeignKey('roles.role'))
-        school_class = Column(String, ForeignKey('school_classes.school_class'))
+        role = Column(String, ForeignKey('roles.role', onupdate='CASCADE', ondelete='CASCADE'))
+        school_class = Column(String, ForeignKey('school_classes.school_class', onupdate='CASCADE', ondelete='CASCADE'))
         transaction_item = relationship('Items', secondary='transactions', backref='transaction_items')
 
         def __repr__(self):
@@ -63,8 +63,8 @@ def create_models(engine, base):
     class Transactions(base):
         __tablename__ = "transactions"
         id = Column(Integer, transaction_sequence, primary_key=True, server_default=transaction_sequence.next_value())
-        user = Column(String, ForeignKey("users.username"))
-        item = Column(String, ForeignKey("items.item_name"))
+        user = Column(String, ForeignKey("users.username", onupdate='CASCADE', ondelete='CASCADE'))
+        item = Column(String, ForeignKey("items.item_name", onupdate='CASCADE', ondelete='CASCADE'))
         payment_status = Column(String, ForeignKey("payment_status.status"))
         transaction_time = Column(DateTime)
 
@@ -75,7 +75,7 @@ def create_models(engine, base):
         __tablename__ = "grouped_transactions"
         id = Column(Integer, gr_transaction_sequence, primary_key=True,
                     server_default=gr_transaction_sequence.next_value())
-        user = Column(String(20), ForeignKey('users.username'))
+        user = Column(String(20), ForeignKey('users.username', onupdate='CASCADE', ondelete='CASCADE'))
         items = Column(String)
         items_value = Column(Float)
         transaction_time = Column(DateTime, unique=True)
