@@ -10,7 +10,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.database import Database
-from src.routers import auth
 
 load_dotenv()
 Base = declarative_base()
@@ -70,7 +69,118 @@ async def add_item_to_transaction(body: dict):
     db.insert.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, user, transaction_time)
 
 
-app.include_router(auth.router)
+@app.post('/users')
+async def asks(body: dict):
+    """Endpoint for adding users"""
+    password = body['password']
+    username = body['username']
+    mail = body['mail']
+    hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
+    try:
+        create_session_user(engine, UserModel, mail, hashed_password, username)
+    except IntegrityError:
+        print("Email or username is already taken")
+        raise HTTPException(
+            status_code=401,
+            detail="Email or username is already taken"
+        )
+    return Response(status_code=200, content="OK")
+
+
+""" Authorization part of backend """
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def verify_password(username, plain_password, hashed_password):
+    decoded_hashed = jwt.decode(hashed_password, SECRET_KEY, ALGORITHM)
+    if decoded_hashed[username] == plain_password:
+        return True
+    else:
+        return False
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def get_user(username: str):
+    users = engine.execute(f"SELECT username, mail, hashed_password FROM users WHERE username = '{username}'")
+    results = users.fetchall()
+    try:
+        user = results[0]
+    except IndexError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This username does not exist",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    # user_model = User(username=user[0], mail=user[1])
+    return UserInDb(username=user[0], mail=user[1], hashed_password=user[2])
+
+
+def authenticate_user(username: str, password: str):
+    user = get_user(username)
+    if not user:
+        return False
+    if not verify_password(username, password, user.hashed_password):
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = get_user(username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@app.post("/token", response_model=Token)
+async def login_for_access_token(
+        form_data: OAuth2PasswordRequestForm = Depends()):  # form_data:OAuth2PasswordRequestForm = Depends()
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    access_token_expires = timedelta(minutes=TOKEN_EXPIRE)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
 
 if __name__ == "__main__":
     uvicorn.run(

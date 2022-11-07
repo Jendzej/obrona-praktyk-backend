@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
@@ -86,3 +87,21 @@ def create_models(engine, base):
 
     base.metadata.create_all(engine)
     return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions, GroupedTransactions]]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class User(BaseModel):
+    username: str
+    mail: str
+
+
+class UserInDb(User):
+    hashed_password: str
