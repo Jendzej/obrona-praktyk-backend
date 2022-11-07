@@ -78,6 +78,7 @@ def create_models(engine, base):
         user = Column(String(20), ForeignKey('users.username', onupdate='CASCADE', ondelete='CASCADE'))
         items = Column(String)
         items_value = Column(Float)
+        payment_status = Column(ForeignKey('payment_status.status'))
         transaction_time = Column(DateTime, unique=True)
 
         def __repr__(self):

@@ -83,7 +83,7 @@ class Insert:
             raise IE
 
     def group_transaction(self, transaction_model, gr_transaction_model, item_model, user: str,
-                          transaction_time: datetime):
+                          status):
         session = self.create_session()
         users_transaction = session.query(transaction_model).filter(transaction_model.user == user).all()
         users_transaction.reverse()
@@ -104,6 +104,7 @@ class Insert:
                 user=user,
                 items=MutableList.as_mutable(times[key]),
                 items_value=items_value,
+                payment_status=status,
                 transaction_time=key
             )
             session.add(to_add)
