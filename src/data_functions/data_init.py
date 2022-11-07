@@ -15,6 +15,7 @@ class Init:
 
     def add_data(self, model):
         session = self.create_session()
+        session.add(model)
         try:
             logger.info(f"Adding data to database...")
             session.commit()
@@ -22,6 +23,7 @@ class Init:
         except IntegrityError as IE:
             # logger.debug(IE)
             raise IE
+        session.commit()
 
     def add_multiple_data(self, models: list):
         for model in models:
@@ -31,7 +33,8 @@ class Init:
         model_school_classes = initial_models[0]
         model_roles = initial_models[1]
         model_payment_status = initial_models[2]
-
+        model_item = initial_models[3]
+        
         self.add_multiple_data([
             model_school_classes(school_class="1TIP"),
             model_school_classes(school_class="1TI1"),
@@ -60,7 +63,15 @@ class Init:
             model_payment_status(status="paid"),
             model_payment_status(status="not paid"),
             model_payment_status(status="pending"),
-            model_payment_status(status="other")
+            model_payment_status(status="other"),
+
+            model_item(item_name='Bułka z kurczakiem', item_price=5.5,
+                       item_description='Bułka z panierowanym kurczakiem, pomidorem, sałatą i serem',
+                       item_image_url='url'),
+            model_item(item_name='Bagietka czosnkowa', item_price=2.5, item_description='Bagietka z masłem czosnkowym',
+                       item_image_url='url2'),
+            model_item(item_name='Drożdzówka z kruszonką', item_price=3.0,
+                       item_description='Drożdzówka z kruszonką i lukrem', item_image_url='url3')
         ])
 
     def create_tables(self, base):
@@ -68,7 +79,8 @@ class Init:
         model_school_classes = model_list[0][0]
         model_roles = model_list[0][1]
         model_payment_status = model_list[0][2]
-        initial_models = [model_school_classes, model_roles, model_payment_status]
+        model_item = model_list[1][0]
+        initial_models = [model_school_classes, model_roles, model_payment_status, model_item]
 
         try:
             self.initial_insertion(initial_models)

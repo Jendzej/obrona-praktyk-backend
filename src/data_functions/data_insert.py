@@ -82,7 +82,7 @@ class Insert:
         except IntegrityError as IE:
             raise IE
 
-    def group_transaction(self, transaction_model, gr_transaction_model, item_model, user: str,
+    def group_transaction(self, transaction_model, item_model, gr_transaction_model, user: str,
                           status):
         session = self.create_session()
         users_transaction = session.query(transaction_model).filter(transaction_model.user == user).all()
@@ -99,7 +99,8 @@ class Insert:
             session.rollback()
             items_value: float = 0
             for data in times[key]:
-                items_value += session.query(item_model).filter(item_model.item_name == data).first().item_price
+                items_value += session.query(item_model).filter(
+                    item_model.item_name == data).first().item_price
             to_add = gr_transaction_model(
                 user=user,
                 items=MutableList.as_mutable(times[key]),
