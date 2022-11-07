@@ -9,8 +9,8 @@ from jose import jwt
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.authorization import auth
 from src.database import Database
+from src.routers import auth
 
 load_dotenv()
 Base = declarative_base()
@@ -23,7 +23,6 @@ app.add_middleware(
     allow_methods=["POST", "GET"],
     allow_headers=["*"]
 )
-app.include_router(auth.router)
 
 # CONNECTING TO DB
 db = Database(os.getenv("POSTGRES_USER"), os.getenv("POSTGRES_PASSWORD"), os.getenv("POSTGRES_HOST"),
@@ -70,6 +69,8 @@ async def add_item_to_transaction(body: dict):
                                                    transaction_time=transaction_time))
     db.insert.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, user, transaction_time)
 
+
+app.include_router(auth.router)
 
 if __name__ == "__main__":
     uvicorn.run(
