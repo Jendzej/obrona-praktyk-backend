@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from src.data_functions import add_data, add_multiple_data, select_user, update_user, select_all_data
 from src.data_insert import insert_transaction, insert_user, group_transaction
+from src.data_update import Update
 from src.database_start_data import initial_insertion
 from src.fetch_data import fetch_last, fetch_all
 from src.log import logger
@@ -27,6 +28,7 @@ class Database:
         self.db_port = db_port
         self.db_name = db_name
         self.engine = engine(db_user, db_password, db_host, db_port, db_name)
+        self.update = Update(self.engine)
 
     def connecting_db(self):
         logger.info("Connecting to database ...")
@@ -35,7 +37,7 @@ class Database:
                 self.engine.connect()
                 break
             except OperationalError as OpErr:
-                logger.debug(OpErr)
+                logger.error(OpErr)
                 logger.info("Trying again...")
                 time.sleep(2)
                 continue

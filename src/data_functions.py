@@ -63,12 +63,3 @@ def update_user(engine, user_model, username, new_user_data: dict):
     sess.query(user_model).filter(user_model.id == user_to_update.id).update(new_user_data)
     sess.commit()
     return sess.query(user_model).filter(user_model.id == user_to_update.id).all()
-
-
-def update_item(engine, item_model, item_name, new_item_data: dict):
-    session = sessionmaker()
-    sess = session()
-    item_to_update = select_item(engine, item_model, item_name)
-    sess.query(item_model).filter(item_model.id == item_to_update.id).update(new_item_data)
-    sess.commit()
-    return sess.query(item_model).filter(item_model.id == item_to_update.id).all()

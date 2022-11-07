@@ -54,12 +54,14 @@ db.add_multiple_records([
                          transaction_time=time_tr)
 ])
 '''
+
 # db.add_transaction(model_of_transaction, 'JohnyTest', 'item2', 'paid', datetime.datetime.today())
 
-# db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, 'JohnyTest',
-#                      datetime.datetime.today())
+db.group_transaction(model_of_transaction, model_of_gr_transaction, model_of_item, 'JohnyTest',
+                     datetime.datetime.today())
 
-db.user_update(model_of_user, 'JohnyTest', {'username': 'JohnyFest'})
+# db.user_update(model_of_user, 'JohnyTest', {'username': 'JohnyFest'})
+db.update.update_user(model_of_user, 'Jedrzej250', {'username': 'Jedrzej420'})
 
 
 @app.post('/add_transaction')
