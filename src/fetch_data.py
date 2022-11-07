@@ -19,3 +19,18 @@ class Fetch:
 
         data = session.query(model).all()
         return data
+
+    def user(self, user_model, username):
+        session = self.create_session()
+        data = session.query(user_model).filter(user_model.username == username).one()
+        return data
+
+    def item(self, item_model, item_name):
+        session = self.create_session()
+        data = session.query(item_model).filter(item_model.item_name == item_name).one()
+        return data
+
+    def users_transactions(self, transaction_model, username):
+        session = self.create_session()
+        data = session.query(transaction_model).filter(transaction_model.user == username).all()
+        return data
