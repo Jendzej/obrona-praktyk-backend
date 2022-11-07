@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
-from src.data_functions import select_user, select_all_data
 from src.data_insert import Insert
 from src.data_update import Update
 from src.database_start_data import initial_insertion
@@ -58,9 +57,3 @@ class Database:
         except IntegrityError as IE:
             logger.info("Database start data already exists, skipping insertion")
         return model_list[1]
-
-    def get_user(self, model, username):
-        return select_user(self.engine, model, username)
-
-    def get_table_data(self, model):
-        return select_all_data(self.engine, model)
