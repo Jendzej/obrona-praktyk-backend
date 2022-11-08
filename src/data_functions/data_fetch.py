@@ -1,3 +1,4 @@
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 
 
@@ -22,7 +23,11 @@ class Fetch:
 
     def user(self, user_model, username):
         session = self.create_session()
-        data = session.query(user_model).filter(user_model.username == username).one()
+        try:
+            data = session.query(user_model).filter(user_model.username == username).one()
+        except NoResultFound as er:
+            raise er
+
         return data
 
     def item(self, item_model, item_name):
