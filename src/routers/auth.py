@@ -10,6 +10,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.database import Database
+from src.log import logger
 from src.models import TokenData, User, UserInDb, Token
 
 load_dotenv()
@@ -62,6 +63,7 @@ def get_user(username: str):
     try:
         user = db.fetch.user(model_of_user, username)
     except NoResultFound:
+        logger.error(f"No result found, HTTP_400_BAD_REQUEST - This username does not exist '{username}'")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This username does not exist",
@@ -90,12 +92,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
+            logger.error(f"{credentials_exception}")
             raise credentials_exception
         token_data = TokenData(username=username)
     except JWTError:
+        logger.error(f"{credentials_exception}")
         raise credentials_exception
     user = get_user(username=token_data.username)
     if user is None:
+        logger.error(f"{credentials_exception}")
         raise credentials_exception
     return user
 
@@ -109,6 +114,7 @@ async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends()):  # form_data:OAuth2PasswordRequestForm = Depends()
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
+        logger.error("HTTP_401_UNAUTHORIZED - Incorrect username or password")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from src.database import Database
 from src.routers.auth import router as AuthRouter
+from src.routers.transactions import router as TransactionsRouter
 
 load_dotenv()
 Base = declarative_base()
@@ -30,7 +31,6 @@ app.add_middleware(
     allow_methods=["POST", "GET"],
     allow_headers=["*"]
 )
-app.include_router(AuthRouter)
 
 # CONNECTING TO DB
 db = Database(os.getenv("POSTGRES_USER"), os.getenv("POSTGRES_PASSWORD"), os.getenv("POSTGRES_HOST"),
@@ -65,6 +65,9 @@ async def asks(body: dict):
         )
     return Response(status_code=200, content="OK")
 
+
+app.include_router(AuthRouter)
+app.include_router(TransactionsRouter)
 
 if __name__ == "__main__":
     uvicorn.run(
