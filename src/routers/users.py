@@ -59,3 +59,8 @@ async def update_user(body: dict, current_user: User = Depends(get_current_activ
             db.update.user(model_of_user, current_user.username, body)
         except KeyError as er:
             logger.error(er)
+            raise HTTPException(
+                status_code=400,
+                detail=f"{er}"
+            )
+    return Response(status_code=200, content="OK")

@@ -2,7 +2,7 @@ import datetime
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -51,6 +51,7 @@ async def add_transaction(body: dict, current_user: User = Depends(get_current_a
                                     status=payment_status)
     except IntegrityError as IE:
         logger.error(IE)
+    return Response(status_code=200, content="OK")
 
 
 @router.post("/delete_transaction")
@@ -61,3 +62,4 @@ async def delete_transaction(body: dict):
         logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
     except NoResultFound:
         logger.error(f"No Result Found for time {transaction_time}")
+    return Response(status_code=200, content="OK")

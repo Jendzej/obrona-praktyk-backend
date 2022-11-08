@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -38,4 +38,8 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
         db.insert.item(model_of_item, item_name, item_price, item_description, item_image_url)
     except IntegrityError as er:
         logger.error(er)
-        raise
+        raise HTTPException(
+            status_code=400,
+            detail=f"Integrity Error {er}"
+        )
+    return Response(status_code=200, content="OK")
