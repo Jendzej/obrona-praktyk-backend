@@ -101,6 +101,7 @@ class TokenData(BaseModel):
 class User(BaseModel):
     username: str
     mail: str
+    role: str
 
 
 class UserInDb(User):

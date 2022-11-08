@@ -69,7 +69,7 @@ def get_user(username: str):
             detail="This username does not exist",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    return UserInDb(username=user.username, mail=user.email, hashed_password=user.password)
+    return UserInDb(username=user.username, mail=user.email, role=user.role, hashed_password=user.password)
 
 
 def authenticate_user(username: str, password: str):

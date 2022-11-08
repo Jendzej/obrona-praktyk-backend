@@ -21,6 +21,7 @@ class Delete:
 
         session.query(item_model).filter(item_model.item_name == item_name).delete()
         session.commit()
+        session.close()
         logger.debug(f"Item '{item_name}' successfully deleted!")
 
     def user(self, user_model, username):
@@ -32,6 +33,7 @@ class Delete:
 
         session.query(user_model).filter(user_model.username == username).delete()
         session.commit()
+        session.close()
         logger.debug(f"User '{username}' successfully deleted!")
 
     def school_class(self, school_class_model, school_class):
@@ -43,6 +45,7 @@ class Delete:
 
         session.query(school_class_model).filter(school_class_model.school_class == school_class).delete()
         session.commit()
+        session.close()
         logger.debug(f"School class '{school_class}' successfully deleted!")
 
     def role(self, role_model, role):
@@ -54,6 +57,7 @@ class Delete:
 
         session.query(role_model).filter(role_model.role == role).delete()
         session.commit()
+        session.close()
         logger.debug(f"Role '{role}' successfully deleted!")
 
     def transaction(self, transaction_model, gr_transaction_model, transaction_time):
@@ -66,6 +70,7 @@ class Delete:
                 transaction.delete()
                 self.gr_transaction(gr_transaction_model, transaction_time)
             session.commit()
+            session.close()
         else:
             raise NoResultFound
 
@@ -78,3 +83,4 @@ class Delete:
 
         session.query(gr_transaction_model).filter(gr_transaction_model.transaction_time == transaction_time).delete()
         session.commit()
+        session.close()

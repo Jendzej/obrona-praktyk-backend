@@ -17,6 +17,7 @@ class Insert:
         session = self.create_session()
         try:
             session.commit()
+            session.close()
         except IntegrityError as IE:
             raise IE
 
@@ -35,6 +36,7 @@ class Insert:
         session.add(to_add)
         try:
             session.commit()
+            session.close()
         except IntegrityError as IE:
             raise IE
 
@@ -53,6 +55,7 @@ class Insert:
         session.add(to_add)
         try:
             session.commit()
+            session.close()
         except IntegrityError as IE:
             raise IE
 
@@ -68,6 +71,7 @@ class Insert:
         session.add(to_add)
         try:
             session.commit()
+            session.close()
         except IntegrityError as IE:
             raise IE
 
@@ -104,5 +108,6 @@ class Insert:
                 session.add(to_add)
             try:
                 session.commit()
+                session.close()
             except IntegrityError as IE:
                 raise IE

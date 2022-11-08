@@ -18,6 +18,7 @@ class Update:
             raise er
         session.query(item_model).filter(item_model.id == item_to_update.id).update(new_item_data)
         session.commit()
+        session.close()
 
     def user(self, user_model, username, new_user_data: dict):
         session = self.create_session()
@@ -27,3 +28,4 @@ class Update:
             raise er
         session.query(user_model).filter(user_model.id == user_to_update.id).update(new_user_data)
         session.commit()
+        session.close()

@@ -30,7 +30,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 @router.post('/add_user')
-async def ad_user(body: dict):
+async def add_user(body: dict):
     """Endpoint for adding users"""
     username = body['username']
     email = body['email']
@@ -52,12 +52,39 @@ async def ad_user(body: dict):
     return Response(status_code=200, content="OK")
 
 
-@router.post('/udate_user')
+@router.get("/get_user")
+async def get_user(current_user: User = Depends(get_current_active_user)):
+    return current_user.username, current_user.role
+
+
+@router.get("/get_all_users")
+async def get_all_users(current_user: User = Depends(get_current_active_user)):
+    if current_user.role == "admin":
+        results = db.fetch.all(model_of_user)
+    return results
+
+
+@router.post('/update_user')
 async def update_user(body: dict, current_user: User = Depends(get_current_active_user)):
     updated_user = body["updated_user"]
-    if updated_user["username"] == current_user.username:
+    if updated_user["username"] == current_user.username or current_user.role == "admin":
         try:
             db.update.user(model_of_user, current_user.username, updated_user)
+        except KeyError as er:
+            logger.error(er)
+            raise HTTPException(
+                status_code=400,
+                detail=f"{er}"
+            )
+    return Response(status_code=200, content="OK")
+
+
+@router.post("/delete_user")
+async def delete_user(body: dict, current_user: User = Depends(get_current_active_user)):
+    username = body["username"]
+    if username == current_user.username or current_user.role == "admin":
+        try:
+            db.delete.user(model_of_user, username)
         except KeyError as er:
             logger.error(er)
             raise HTTPException(
