@@ -53,7 +53,7 @@ def create_models(engine, base):
         email = Column(String(50), unique=True)
         first_name = Column(String(30))
         last_name = Column(String(30))
-        password = Column(String(30))
+        password = Column(String(150))
         role = Column(String, ForeignKey('roles.role', onupdate='CASCADE', ondelete='CASCADE'))
         school_class = Column(String, ForeignKey('school_classes.school_class', onupdate='CASCADE', ondelete='CASCADE'))
         transaction_item = relationship('Items', secondary='transactions', backref='transaction_items')

@@ -54,7 +54,7 @@ async def asks(body: dict):
     """Endpoint for adding users"""
     password = body['password']
     username = body['username']
-    email = body['mail']
+    email = body['email']
     hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
     role = 'user'
     try:
