@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from src.database import Database
 from src.routers.auth import router as authentication_router
+from src.routers.items import router as item_router
 from src.routers.transactions import router as transaction_router
 from src.routers.users import router as user_router
 
@@ -33,6 +34,7 @@ app.add_middleware(
 app.include_router(authentication_router)
 app.include_router(transaction_router)
 app.include_router(user_router)
+app.include_router(item_router)
 
 if __name__ == "__main__":
     uvicorn.run(
