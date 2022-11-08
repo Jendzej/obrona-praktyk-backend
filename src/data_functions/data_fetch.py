@@ -12,13 +12,18 @@ class Fetch:
 
     def last(self, model):
         session = self.create_session()
-        data = session.query(model).first()
+        try:
+            data = session.query(model).first()
+        except NoResultFound as er:
+            raise er
         return data
 
     def all(self, model):
         session = self.create_session()
-
-        data = session.query(model).all()
+        try:
+            data = session.query(model).all()
+        except NoResultFound as er:
+            raise er
         return data
 
     def user(self, user_model, username):
@@ -32,10 +37,16 @@ class Fetch:
 
     def item(self, item_model, item_name):
         session = self.create_session()
-        data = session.query(item_model).filter(item_model.item_name == item_name).one()
+        try:
+            data = session.query(item_model).filter(item_model.item_name == item_name).one()
+        except NoResultFound as er:
+            raise er
         return data
 
     def users_transactions(self, transaction_model, username):
         session = self.create_session()
-        data = session.query(transaction_model).filter(transaction_model.user == username).all()
+        try:
+            data = session.query(transaction_model).filter(transaction_model.user == username).all()
+        except NoResultFound as er:
+            raise er
         return data

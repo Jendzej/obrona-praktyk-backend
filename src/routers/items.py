@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Response, HTTPException
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.database import Database
@@ -43,3 +43,44 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
             detail=f"Integrity Error {er}"
         )
     return Response(status_code=200, content="OK")
+
+
+@router.get("/get_item")
+async def get_items(body: dict, current_user: User = Depends(get_current_active_user)):
+    item_name = body["item_name"]
+    try:
+        results = db.fetch.item(model_of_item, item_name)
+    except NoResultFound as er:
+        logger.error(er)
+        raise HTTPException(
+            status_code=400,
+            detail=f"{er}"
+        )
+    return results
+
+
+@router.post("/update_item")
+async def update_item(body: dict, current_user: User = Depends(get_current_active_user)):
+    item_name = body["item_name"]
+    updated_item = body["updated_item"]
+    try:
+        db.update.item(model_of_item, item_name, updated_item)
+    except NoResultFound as er:
+        logger.error(er)
+        raise HTTPException(
+            status_code=400,
+            detail=f"{er}"
+        )
+
+
+@router.post("/delete_item")
+async def delete_item(body: dict, current_user: User = Depends(get_current_active_user)):
+    item_name = body["item_name"]
+    try:
+        db.delete.item(model_of_item, item_name)
+    except NoResultFound as er:
+        logger.error(er)
+        raise HTTPException(
+            status_code=400,
+            detail=f"{er}"
+        )

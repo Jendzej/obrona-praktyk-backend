@@ -54,9 +54,10 @@ async def ad_user(body: dict):
 
 @router.post('/udate_user')
 async def update_user(body: dict, current_user: User = Depends(get_current_active_user)):
-    if body["username"] == current_user.username:
+    updated_user = body["updated_user"]
+    if updated_user["username"] == current_user.username:
         try:
-            db.update.user(model_of_user, current_user.username, body)
+            db.update.user(model_of_user, current_user.username, updated_user)
         except KeyError as er:
             logger.error(er)
             raise HTTPException(
