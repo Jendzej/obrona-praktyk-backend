@@ -56,7 +56,7 @@ class Delete:
         session.commit()
         logger.debug(f"Role '{role}' successfully deleted!")
 
-    def transaction(self, transaction_model, transaction_time):
+    def transaction(self, transaction_model, gr_transaction_model, transaction_time):
         session = self.create_session()
 
         data = session.query(transaction_model).filter(transaction_model.transaction_time == transaction_time).all()
@@ -64,6 +64,7 @@ class Delete:
         if len(data) != 0:
             for transaction in data:
                 transaction.delete()
+                self.gr_transaction(gr_transaction_model, transaction_time)
             session.commit()
         else:
             raise NoResultFound
@@ -77,4 +78,3 @@ class Delete:
 
         session.query(gr_transaction_model).filter(gr_transaction_model.transaction_time == transaction_time).delete()
         session.commit()
-        logger.debug(f"Grouped transaction at '{transaction_time}' successfully deleted!")

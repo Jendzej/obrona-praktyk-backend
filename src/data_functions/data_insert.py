@@ -4,8 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import sessionmaker
 
-from src.log import logger
-
 
 class Insert:
     def __init__(self, engine):
@@ -18,11 +16,8 @@ class Insert:
     def data(self, model):
         session = self.create_session()
         try:
-            logger.info(f"Adding data to database...")
             session.commit()
-            logger.debug(f"Successfully added data - {model}")
         except IntegrityError as IE:
-            # logger.debug(IE)
             raise IE
 
     def multiple_data(self, models: list):
@@ -39,9 +34,7 @@ class Insert:
         )
         session.add(to_add)
         try:
-            logger.info(f"Adding data to database...")
             session.commit()
-            logger.debug(f"Successfully added data - {to_add}")
         except IntegrityError as IE:
             raise IE
 
@@ -59,9 +52,7 @@ class Insert:
         )
         session.add(to_add)
         try:
-            logger.info(f"Adding data to database...")
             session.commit()
-            logger.debug(f"Successfully added data - {to_add}")
         except IntegrityError as IE:
             raise IE
 
@@ -76,9 +67,7 @@ class Insert:
         )
         session.add(to_add)
         try:
-            logger.info(f"Adding data to database...")
             session.commit()
-            logger.debug(f"Successfully added data - {to_add}")
         except IntegrityError as IE:
             raise IE
 
@@ -89,29 +78,31 @@ class Insert:
         users_transaction.reverse()
         times = {}
         for item_in_transaction in users_transaction:
-            try:
+            if f"{item_in_transaction.transaction_time}" in item_in_transaction.values():
                 times[f'{item_in_transaction.transaction_time}'].append(item_in_transaction.item)
-            except KeyError:
+            else:
                 times[f'{item_in_transaction.transaction_time}'] = []
                 times[f'{item_in_transaction.transaction_time}'].append(item_in_transaction.item)
 
+        gr_transactions = session.query(gr_transaction_model).filter(gr_transaction_model.user == user).all()
+        gr_times = [value.values() for value in gr_transactions]
+
         for key in times:
-            session.rollback()
-            items_value: float = 0
-            for data in times[key]:
-                items_value += session.query(item_model).filter(
-                    item_model.item_name == data).first().item_price
-            to_add = gr_transaction_model(
-                user=user,
-                items=MutableList.as_mutable(times[key]),
-                items_value=items_value,
-                payment_status=status,
-                transaction_time=key
-            )
-            session.add(to_add)
+            if key not in gr_times:
+                session.rollback()
+                items_value: float = 0
+                for data in times[key]:
+                    items_value += session.query(item_model).filter(
+                        item_model.item_name == data).first().item_price
+                to_add = gr_transaction_model(
+                    user=user,
+                    items=MutableList.as_mutable(times[key]),
+                    items_value=items_value,
+                    payment_status=status,
+                    transaction_time=key
+                )
+                session.add(to_add)
             try:
-                logger.info(f"Grouping transactions...")
                 session.commit()
-                logger.debug(f"Successfully added data - {to_add}")
             except IntegrityError as IE:
                 raise IE
