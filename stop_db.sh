@@ -1,3 +1,2 @@
 #!/bin/bash
-docker stop backend_db
-docker rm backend_db
+docker rm -f backend_db

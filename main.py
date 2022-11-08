@@ -41,3 +41,15 @@ if __name__ == "__main__":
         reload=True,
         port=8000
     )
+
+"""
+SAMPLE USER BODY (DICT)
+{
+"username":"user",
+"email":"email",
+"first_name":"First",
+"last_name":"Last",
+"password":"password",
+"school_class":"4TIP"
+}
+"""
