@@ -45,9 +45,6 @@ model_of_user = model_list[1]
 model_of_transaction = model_list[2]
 model_of_gr_transaction = model_list[3]
 
-db.delete.item(model_of_item, 'item1')
-db.delete.user(model_of_user, 'user1')
-
 
 @app.post('/users')
 async def asks(body: dict):
