@@ -34,7 +34,7 @@ class Init:
         model_roles = initial_models[1]
         model_payment_status = initial_models[2]
         model_item = initial_models[3]
-        
+
         self.add_multiple_data([
             model_school_classes(school_class="1TIP"),
             model_school_classes(school_class="1TI1"),
@@ -65,13 +65,13 @@ class Init:
             model_payment_status(status="pending"),
             model_payment_status(status="other"),
 
-            model_item(item_name='Bułka z kurczakiem', item_price=5.5,
-                       item_description='Bułka z panierowanym kurczakiem, pomidorem, sałatą i serem',
+            model_item(item_name='Bulka z kurczakiem', item_price=5.5,
+                       item_description='Bulka z panierowanym kurczakiem, pomidorem, salata i serem',
                        item_image_url='url'),
-            model_item(item_name='Bagietka czosnkowa', item_price=2.5, item_description='Bagietka z masłem czosnkowym',
+            model_item(item_name='Bagietka czosnkowa', item_price=2.5, item_description='Bagietka z maslem czosnkowym',
                        item_image_url='url2'),
-            model_item(item_name='Drożdzówka z kruszonką', item_price=3.0,
-                       item_description='Drożdzówka z kruszonką i lukrem', item_image_url='url3')
+            model_item(item_name='Drozdzowka z kruszonka', item_price=3.0,
+                       item_description='Drozdzowka z kruszonka i lukrem', item_image_url='url3')
         ])
 
     def create_tables(self, base):

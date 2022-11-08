@@ -17,8 +17,7 @@ class Delete:
         try:
             session.query(item_model).filter(item_model.item_name == item_name).one()
         except NoResultFound:
-            logger.error(f"Cannot find item '{item_name}'")
-            return
+            raise NoResultFound
 
         session.query(item_model).filter(item_model.item_name == item_name).delete()
         session.commit()
@@ -29,8 +28,7 @@ class Delete:
         try:
             session.query(user_model).filter(user_model.username == username).one()
         except NoResultFound:
-            logger.error(f"Cannot find user '{username}'")
-            return
+            raise NoResultFound
 
         session.query(user_model).filter(user_model.username == username).delete()
         session.commit()
@@ -41,8 +39,7 @@ class Delete:
         try:
             session.query(school_class_model).filter(school_class_model.school_class == school_class).one()
         except NoResultFound:
-            logger.error(f"Cannot find school class '{school_class}'")
-            return
+            raise NoResultFound
 
         session.query(school_class_model).filter(school_class_model.school_class == school_class).delete()
         session.commit()
@@ -53,8 +50,7 @@ class Delete:
         try:
             session.query(role_model).filter(role_model.role == role).one()
         except NoResultFound:
-            logger.error(f"Cannot find role '{role}'")
-            return
+            raise NoResultFound
 
         session.query(role_model).filter(role_model.role == role).delete()
         session.commit()
@@ -62,23 +58,22 @@ class Delete:
 
     def transaction(self, transaction_model, transaction_time):
         session = self.create_session()
-        try:
-            session.query(transaction_model).filter(transaction_model.transaction_time == transaction_time).one()
-        except NoResultFound:
-            logger.error(f"Cannot find transaction at '{transaction_time}'")
-            return
 
-        session.query(transaction_model).filter(transaction_model.transaction_time == transaction_time).delete()
-        session.commit()
-        logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
+        data = session.query(transaction_model).filter(transaction_model.transaction_time == transaction_time).all()
+
+        if len(data) != 0:
+            for transaction in data:
+                transaction.delete()
+            session.commit()
+        else:
+            raise NoResultFound
 
     def gr_transaction(self, gr_transaction_model, transaction_time):
         session = self.create_session()
         try:
             session.query(gr_transaction_model).filter(gr_transaction_model.transaction_time == transaction_time).one()
         except NoResultFound:
-            logger.error(f"Cannot find gr_transaction at '{transaction_time}'")
-            return
+            raise NoResultFound
 
         session.query(gr_transaction_model).filter(gr_transaction_model.transaction_time == transaction_time).delete()
         session.commit()
