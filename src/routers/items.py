@@ -45,7 +45,7 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
     return Response(status_code=200, content="OK")
 
 
-@router.get("/get_item")
+@router.post("/get_item")
 async def get_items(body: dict, current_user: User = Depends(get_current_active_user)):
     item_name = body["item_name"]
     try:
