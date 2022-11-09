@@ -30,13 +30,19 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
     item_price = body["item_price"]
     item_description = body["item_description"]
     item_image_url = body["item_image_url"]
-    try:
-        insert_item(engine, model_of_item, item_name, item_price, item_description, item_image_url)
-    except IntegrityError as er:
-        logger.error(er)
+    if current_user.role == "admin":
+        try:
+            insert_item(engine, model_of_item, item_name, item_price, item_description, item_image_url)
+        except IntegrityError as er:
+            logger.error(er)
+            raise HTTPException(
+                status_code=400,
+                detail=f"Integrity Error {er}"
+            )
+    else:
         raise HTTPException(
-            status_code=400,
-            detail=f"Integrity Error {er}"
+            status_code=403,
+            detail="You have no permission to do that."
         )
     return Response(status_code=200, content="OK")
 
@@ -67,24 +73,38 @@ async def get_all_items():
 async def update_item(body: dict, current_user: User = Depends(get_current_active_user)):
     item_name = body["item_name"]
     updated_item = body["updated_item"]
-    try:
-        updated_item(engine, model_of_item, item_name, updated_item)
-    except NoResultFound as er:
-        logger.error(er)
+    if current_user.role == "admin":
+        try:
+            updated_item(engine, model_of_item, item_name, updated_item)
+        except NoResultFound as er:
+            logger.error(er)
+            raise HTTPException(
+                status_code=400,
+                detail=f"{er}"
+            )
+    else:
         raise HTTPException(
-            status_code=400,
-            detail=f"{er}"
+            status_code=403,
+            detail="You have no permission to do that."
         )
+    return Response(status_code=200, content="OK")
 
 
 @router.post("/delete_item")
 async def del_item(body: dict, current_user: User = Depends(get_current_active_user)):
     item_name = body["item_name"]
-    try:
-        delete_item(engine, model_of_item, item_name)
-    except NoResultFound as er:
-        logger.error(er)
+    if current_user.role == "admin":
+        try:
+            delete_item(engine, model_of_item, item_name)
+        except NoResultFound as er:
+            logger.error(er)
+            raise HTTPException(
+                status_code=400,
+                detail=f"{er}"
+            )
+    else:
         raise HTTPException(
-            status_code=400,
-            detail=f"{er}"
+            status_code=403,
+            detail="You have no permission to do that."
         )
+    return Response(status_code=200, content="OK")

@@ -1,7 +1,7 @@
 import datetime
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from main import engine, models
@@ -38,6 +38,8 @@ async def add_transaction(body: dict, current_user: User = Depends(get_current_a
                                payment_status=payment_status, transaction_time=tr_time)
         except IntegrityError as IE:
             logger.error(IE)
+            raise status.HTTP_422_UNPROCESSABLE_ENTITY
+
     return Response(status_code=200, content="OK")
 
 
@@ -49,4 +51,8 @@ async def del_transaction(body: dict):
         logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
     except NoResultFound:
         logger.error(f"No Result Found for time {transaction_time}")
+        raise HTTPException(
+            status_code=400,
+            detail="Bad request, cannot find data."
+        )
     return Response(status_code=200, content="OK")

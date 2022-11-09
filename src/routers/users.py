@@ -1,13 +1,13 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Response, Depends
+from fastapi import APIRouter, HTTPException, Response, Depends, status
 from jose import jwt
 from sqlalchemy.exc import IntegrityError
 
 from main import engine, models
 from src.data_functions.data_delete import delete_user
-from src.data_functions.data_fetch import fetch_all
+from src.data_functions.data_fetch import fetch_all, fetch_user
 from src.data_functions.data_insert import insert_user
 from src.log import logger
 from src.models import User
@@ -51,7 +51,12 @@ async def add_user(body: dict = None):
 
 @router.get("/get_user")
 async def get_user(current_user: User = Depends(get_current_active_user)):
-    return current_user.username, current_user.role
+    try:
+        data = fetch_user(engine, model_of_user, current_user.username)
+    except IntegrityError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+    return data
 
 
 @router.get("/get_all_users")
@@ -61,7 +66,7 @@ async def get_all_users(current_user: User = Depends(get_current_active_user)):
     else:
         raise HTTPException(
             status_code=403,
-            detail="You have no access to this endpoint"
+            detail="You have no permission to do that."
         )
     return results
 
@@ -74,10 +79,7 @@ async def update_user(body: dict = None, current_user: User = Depends(get_curren
             updated_user(engine, model_of_user, current_user.username, updated_user)
         except KeyError as er:
             logger.error(er)
-            raise HTTPException(
-                status_code=400,
-                detail=f"{er}"
-            )
+            raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
 
 
@@ -89,8 +91,5 @@ async def del_user(body: dict = None, current_user: User = Depends(get_current_a
             delete_user(engine, model_of_user, username)
         except KeyError as er:
             logger.error(er)
-            raise HTTPException(
-                status_code=400,
-                detail=f"{er}"
-            )
+            raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
