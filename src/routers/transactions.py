@@ -52,7 +52,7 @@ async def del_transaction(body: dict):
         delete_transaction(engine, model_of_transaction, transaction_time)
         logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
     except NoResultFound:
-        logger.error(f"No Result Found for time {transaction_time}")
+        logger.error(f"No Result Found for that time.")
         raise HTTPException(
             status_code=400,
             detail="Bad request, cannot find data."
