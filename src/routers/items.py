@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, HTTPException, status
+from fastapi import APIRouter, Depends, Response, HTTPException
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from main import engine, models
@@ -34,21 +34,22 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
         item_image_url = body["item_image_url"]
         if current_user.role == "admin":
             insert_item(engine, model_of_item, item_name, item_price, item_description, item_image_url)
+            return Response(status_code=200, content="OK")
         else:
-            raise HTTPException(
+            return HTTPException(
                 status_code=403,
-                detail="You have no permission to do that."
+                detail="You don't have permissions to do that."
             )
-        return Response(status_code=200, content="OK")
     except IntegrityError as er:
         logger.error(er)
-        raise HTTPException(
-            status_code=400,
-            detail=f"Integrity Error {er}"
+        return HTTPException(
+            status_code=400, detail=f"{er}"
         )
     except KeyError as er:
         logger.error(er)
-        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+        return HTTPException(
+            status_code=422, detail=f"{er}"
+        )
 
 
 @router.post("/get_item")
@@ -59,20 +60,23 @@ async def get_item(body: dict, current_user: User = Depends(get_current_active_u
         return results
     except NoResultFound as er:
         logger.error(er)
-        raise HTTPException(
-            status_code=400,
-            detail=f"{er}"
+        return HTTPException(
+            status_code=400, detail=f"{er}"
         )
     except KeyError as er:
         logger.error(er)
-        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+        return HTTPException(
+            status_code=422, detail=f"{er}"
+        )
 
 
 @router.post("/get_all_items")
 async def get_all_items():
     results = fetch_all(engine, model_of_item)
     if len(results) == 0:
-        return Response(status_code=200, content="OK, Nothing to show")
+        return HTTPException(
+            status_code=200, detail="OK, Nothing to show"
+        )
     return results
 
 
@@ -84,19 +88,22 @@ async def item_update(body: dict, current_user: User = Depends(get_current_activ
         if current_user.role == "admin":
             update_item(engine, model_of_item, item_name, updated_item)
         else:
-            raise HTTPException(
+            return HTTPException(
                 status_code=403,
                 detail="You don't have permission to do that."
             )
     except NoResultFound as er:
         logger.error(er)
-        raise HTTPException(
+        return HTTPException(
             status_code=400,
             detail=f"{er}"
         )
     except KeyError as er:
         logger.error(er)
-        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+        return HTTPException(
+            status_code=422,
+            detail=f"{er}"
+        )
     return Response(status_code=200, content="OK")
 
 
@@ -108,16 +115,19 @@ async def del_item(body: dict, current_user: User = Depends(get_current_active_u
             delete_item(engine, model_of_item, item_name)
             return Response(status_code=200, content="OK")
         else:
-            raise HTTPException(
+            return HTTPException(
                 status_code=403,
                 detail="You have no permission to do that."
             )
     except NoResultFound as er:
         logger.error(er)
-        raise HTTPException(
+        return HTTPException(
             status_code=400,
             detail=f"{er}"
         )
     except KeyError as er:
         logger.error(er)
-        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+        return HTTPException(
+            status_code=422,
+            detail=f"{er}"
+        )
