@@ -15,6 +15,7 @@ class Insert:
 
     def data(self, model):
         session = self.create_session()
+        session.add(model)
         try:
             session.commit()
             session.close()

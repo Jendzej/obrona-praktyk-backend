@@ -20,6 +20,7 @@ class Init:
             session.commit()
             session.close()
         except IntegrityError as IE:
+            session.close()
             # logger.debug(IE)
             raise IE
         session.commit()
@@ -40,7 +41,7 @@ class Init:
         model_roles = initial_models[1]
         model_payment_status = initial_models[2]
         model_item = initial_models[3]
-        errors = self.add_multiple_data([
+        data = [
             model_school_classes(school_class="1TIP"),
             model_school_classes(school_class="1TI1"),
             model_school_classes(school_class="1TI2"),
@@ -77,11 +78,12 @@ class Init:
                        item_image_url='url2'),
             model_item(item_name='Drozdzowka z kruszonka', item_price=3.0,
                        item_description='Drozdzowka z kruszonka i lukrem', item_image_url='url3')
-        ])
+        ]
+        errors = self.add_multiple_data(data)
         if len(errors) == 0:
             logger.info("Successfully added db initial data")
         else:
-            logger.info("Db may have contains initial data already")
+            logger.info("Db may contains initial data already")
 
     def create_tables(self, base):
         model_list = create_models(self.engine, base)
@@ -91,9 +93,9 @@ class Init:
         model_item = model_list[1][0]
         initial_models = [model_school_classes, model_roles, model_payment_status, model_item]
 
-        # try:
-        self.initial_insertion(initial_models)
-        logger.info("Inserted database start data")
-        # except IntegrityError:
-        #     logger.info("Database start data already exists, skipping insertion")
+        try:
+            self.initial_insertion(initial_models)
+            logger.info("Inserted database start data")
+        except IntegrityError:
+            logger.info("Database start data already exists, skipping insertion")
         return model_list[1]
