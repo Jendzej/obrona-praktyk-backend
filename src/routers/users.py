@@ -5,15 +5,17 @@ from fastapi import APIRouter, HTTPException, Response, Depends
 from jose import jwt
 from sqlalchemy.exc import IntegrityError
 
-from src.data_functions.data_delete import Delete
-from src.data_functions.data_fetch import Fetch
-from src.data_functions.data_insert import Insert
-from src.data_functions.data_update import Update
+from main import engine, models
+from src.data_functions.data_delete import delete_user
+from src.data_functions.data_fetch import fetch_all
+from src.data_functions.data_insert import insert_user
 from src.log import logger
 from src.models import User
 from src.routers.auth import get_current_active_user
 
 load_dotenv()
+
+model_of_user = models[1]
 
 router = APIRouter(
     tags=["users"]
@@ -24,78 +26,71 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
-class UserEndpoints:
-    def __init__(self, engine, model_of_user):
-        self.engine = engine
-        self.insert = Insert(self.engine)
-        self.fetch = Fetch(self.engine)
-        self.update = Update(self.engine)
-        self.delete = Delete(self.engine)
-        self.model_of_user = model_of_user
+@router.post('/add_user')
+async def add_user(body: dict = None):
+    """Endpoint for adding users"""
+    username = body['username']
+    email = body['email']
+    first_name = body['first_name']
+    last_name = body['last_name']
+    password = body['password']
+    role = 'user'
+    school_class = body['school_class']
 
-    @router.post('/add_user')
-    async def add_user(self=None, body: dict = None):
-        """Endpoint for adding users"""
-        username = body['username']
-        email = body['email']
-        first_name = body['first_name']
-        last_name = body['last_name']
-        password = body['password']
-        role = 'user'
-        school_class = body['school_class']
+    hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
+    try:
+        insert_user(engine, model_of_user, username, email, first_name, last_name, hashed_password, role, school_class)
+    except IntegrityError:
+        logger.debug("Email or username is already taken")
+        raise HTTPException(
+            status_code=401,
+            detail="Email or username is already taken"
+        )
+    return Response(status_code=200, content="OK")
 
-        hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
+
+@router.get("/get_user")
+async def get_user(current_user: User = Depends(get_current_active_user)):
+    return current_user.username, current_user.role
+
+
+@router.get("/get_all_users")
+async def get_all_users(current_user: User = Depends(get_current_active_user)):
+    if current_user.role == "admin":
+        results = fetch_all(engine, model_of_user)
+    else:
+        raise HTTPException(
+            status_code=403,
+            detail="You have no access to this endpoint"
+        )
+    return results
+
+
+@router.post('/update_user')
+async def update_user(body: dict = None, current_user: User = Depends(get_current_active_user)):
+    updated_user = body["updated_user"]
+    if updated_user["username"] == current_user.username or current_user.role == "admin":
         try:
-            self.insert.user(self.model_of_user, username, email, first_name, last_name, hashed_password, role,
-                             school_class)
-        except IntegrityError:
-            logger.debug("Email or username is already taken")
+            updated_user(engine, model_of_user, current_user.username, updated_user)
+        except KeyError as er:
+            logger.error(er)
             raise HTTPException(
-                status_code=401,
-                detail="Email or username is already taken"
+                status_code=400,
+                detail=f"{er}"
             )
-        return Response(status_code=200, content="OK")
+    return Response(status_code=200, content="OK")
 
-    @staticmethod
-    @router.get("/get_user")
-    async def get_user(current_user: User = Depends(get_current_active_user)):
-        return current_user.username, current_user.role
 
-    @router.get("/get_all_users")
-    async def get_all_users(self=None, current_user: User = Depends(get_current_active_user)):
-        if current_user.role == "admin":
-            results = self.fetch.all(self.model_of_user)
-        else:
+@router.post("/delete_user")
+async def del_user(body: dict = None, current_user: User = Depends(get_current_active_user)):
+    username = body["username"]
+    if username == current_user.username or current_user.role == "admin":
+        try:
+            delete_user(engine, model_of_user, username)
+        except KeyError as er:
+            logger.error(er)
             raise HTTPException(
-                status_code=403,
-                detail="You have no access to this endpoint"
+                status_code=400,
+                detail=f"{er}"
             )
-        return results
-
-    @router.post('/update_user')
-    async def update_user(self=None, body: dict = None, current_user: User = Depends(get_current_active_user)):
-        updated_user = body["updated_user"]
-        if updated_user["username"] == current_user.username or current_user.role == "admin":
-            try:
-                self.update.user(self.model_of_user, current_user.username, updated_user)
-            except KeyError as er:
-                logger.error(er)
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"{er}"
-                )
-        return Response(status_code=200, content="OK")
-
-    @router.post("/delete_user")
-    async def delete_user(self=None, body: dict = None, current_user: User = Depends(get_current_active_user)):
-        username = body["username"]
-        if username == current_user.username or current_user.role == "admin":
-            try:
-                self.delete.user(self.model_of_user, username)
-            except KeyError as er:
-                logger.error(er)
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"{er}"
-                )
-        return Response(status_code=200, content="OK")
+    return Response(status_code=200, content="OK")
