@@ -1,3 +1,4 @@
+import uvicorn
 from sqlalchemy.ext.declarative import declarative_base
 
 from src.db import db
@@ -7,3 +8,11 @@ db.connecting_db()
 db.init.create_tables(Base)
 engine = db.engine
 models = db.models
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "api:app",
+        host="0.0.0.0",
+        reload=True,
+        port=8000
+    )

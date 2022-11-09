@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from main import engine, models
 from src.data_functions.data_delete import delete_item
-from src.data_functions.data_fetch import fetch_item
+from src.data_functions.data_fetch import fetch_item, fetch_all
 from src.data_functions.data_insert import insert_item
 from src.log import logger
 from src.models import User
@@ -42,7 +42,7 @@ async def add_item(body: dict, current_user: User = Depends(get_current_active_u
 
 
 @router.post("/get_item")
-async def get_items(body: dict, current_user: User = Depends(get_current_active_user)):
+async def get_item(body: dict, current_user: User = Depends(get_current_active_user)):
     item_name = body["item_name"]
     try:
         results = fetch_item(engine, model_of_item, item_name)
@@ -52,6 +52,14 @@ async def get_items(body: dict, current_user: User = Depends(get_current_active_
             status_code=400,
             detail=f"{er}"
         )
+    return results
+
+
+@router.post("/get_all_items")
+async def get_all_items():
+    results = fetch_all(engine, model_of_item)
+    if len(results) == 0:
+        return Response(status_code=200, content="OK, Nothing to show")
     return results
 
 

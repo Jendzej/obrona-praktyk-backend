@@ -1,6 +1,5 @@
 import os
 
-import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,16 +25,10 @@ app.include_router(transaction_router)
 app.include_router(user_router)
 app.include_router(item_router)
 
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        reload=True,
-        port=8000
-    )
-
 """
-SAMPLE USER BODY (DICT)
+SAMPLE BODIES
+
+USER:
 {
 "username":"user",
 "email":"email",
@@ -44,4 +37,13 @@ SAMPLE USER BODY (DICT)
 "password":"password",
 "school_class":"4TIP"
 }
+
+ITEM:
+{
+"item_name":"item1",
+"item_price": 4.5,
+"item_description": "Description of item 1",
+"item_image_url": "url1"
+}
+
 """
