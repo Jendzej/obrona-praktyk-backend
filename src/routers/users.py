@@ -9,6 +9,7 @@ from main import engine, models
 from src.data_functions.data_delete import delete_user
 from src.data_functions.data_fetch import fetch_all, fetch_user
 from src.data_functions.data_insert import insert_user
+from src.data_functions.data_update import update_user
 from src.log import logger
 from src.models import User
 from src.routers.auth import get_current_active_user
@@ -26,19 +27,32 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
+@router.on_event("startup")
+async def startup():
+    username = os.getenv("PAGE_ADMIN_USERNAME")
+    password = os.getenv("PAGE_ADMIN_PASSWORD")
+    email = os.getenv("PAGE_ADMIN_EMAIL")
+    hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
+    try:
+        insert_user(engine, model_of_user, username, email, username, username, hashed_password, "admin", "1TIP")
+    except IntegrityError:
+        logger.info("Admin account exists, skipping")
+        return
+
+
 @router.post('/add_user')
 async def add_user(body: dict = None):
     """Endpoint for adding users"""
-    username = body['username']
-    email = body['email']
-    first_name = body['first_name']
-    last_name = body['last_name']
-    password = body['password']
-    role = 'user'
-    school_class = body['school_class']
-
-    hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
     try:
+        username = body['username']
+        email = body['email']
+        first_name = body['first_name']
+        last_name = body['last_name']
+        password = body['password']
+        role = 'user'
+        school_class = body['school_class']
+
+        hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
         insert_user(engine, model_of_user, username, email, first_name, last_name, hashed_password, role, school_class)
     except IntegrityError:
         logger.debug("Email or username is already taken")
@@ -46,6 +60,10 @@ async def add_user(body: dict = None):
             status_code=401,
             detail="Email or username is already taken"
         )
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+
     return Response(status_code=200, content="OK")
 
 
@@ -72,24 +90,24 @@ async def get_all_users(current_user: User = Depends(get_current_active_user)):
 
 
 @router.post('/update_user')
-async def update_user(body: dict = None, current_user: User = Depends(get_current_active_user)):
-    updated_user = body["updated_user"]
-    if updated_user["username"] == current_user.username or current_user.role == "admin":
-        try:
-            updated_user(engine, model_of_user, current_user.username, updated_user)
-        except KeyError as er:
-            logger.error(er)
-            raise status.HTTP_422_UNPROCESSABLE_ENTITY
+async def user_update(body: dict = None, current_user: User = Depends(get_current_active_user)):
+    try:
+        updated_user = body["updated_user"]
+        if updated_user["username"] == current_user.username or current_user.role == "admin":
+            update_user(engine, model_of_user, current_user.username, updated_user)
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
 
 
 @router.post("/delete_user")
 async def del_user(body: dict = None, current_user: User = Depends(get_current_active_user)):
-    username = body["username"]
-    if username == current_user.username or current_user.role == "admin":
-        try:
+    try:
+        username = body["username"]
+        if username == current_user.username or current_user.role == "admin":
             delete_user(engine, model_of_user, username)
-        except KeyError as er:
-            logger.error(er)
-            raise status.HTTP_422_UNPROCESSABLE_ENTITY
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")

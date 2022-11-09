@@ -1,13 +1,14 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, HTTPException
+from fastapi import APIRouter, Depends, Response, HTTPException, status
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from main import engine, models
 from src.data_functions.data_delete import delete_item
 from src.data_functions.data_fetch import fetch_item, fetch_all
 from src.data_functions.data_insert import insert_item
+from src.data_functions.data_update import update_item
 from src.log import logger
 from src.models import User
 from src.routers.auth import get_current_active_user
@@ -26,39 +27,45 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 @router.post("/add_item")
 async def add_item(body: dict, current_user: User = Depends(get_current_active_user)):
-    item_name = body["item_name"]
-    item_price = body["item_price"]
-    item_description = body["item_description"]
-    item_image_url = body["item_image_url"]
-    if current_user.role == "admin":
-        try:
+    try:
+        item_name = body["item_name"]
+        item_price = body["item_price"]
+        item_description = body["item_description"]
+        item_image_url = body["item_image_url"]
+        if current_user.role == "admin":
             insert_item(engine, model_of_item, item_name, item_price, item_description, item_image_url)
-        except IntegrityError as er:
-            logger.error(er)
+        else:
             raise HTTPException(
-                status_code=400,
-                detail=f"Integrity Error {er}"
+                status_code=403,
+                detail="You have no permission to do that."
             )
-    else:
+        return Response(status_code=200, content="OK")
+    except IntegrityError as er:
+        logger.error(er)
         raise HTTPException(
-            status_code=403,
-            detail="You have no permission to do that."
+            status_code=400,
+            detail=f"Integrity Error {er}"
         )
-    return Response(status_code=200, content="OK")
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @router.post("/get_item")
 async def get_item(body: dict, current_user: User = Depends(get_current_active_user)):
-    item_name = body["item_name"]
     try:
+        item_name = body["item_name"]
         results = fetch_item(engine, model_of_item, item_name)
+        return results
     except NoResultFound as er:
         logger.error(er)
         raise HTTPException(
             status_code=400,
             detail=f"{er}"
         )
-    return results
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @router.post("/get_all_items")
@@ -70,41 +77,47 @@ async def get_all_items():
 
 
 @router.post("/update_item")
-async def update_item(body: dict, current_user: User = Depends(get_current_active_user)):
-    item_name = body["item_name"]
-    updated_item = body["updated_item"]
-    if current_user.role == "admin":
-        try:
-            updated_item(engine, model_of_item, item_name, updated_item)
-        except NoResultFound as er:
-            logger.error(er)
+async def item_update(body: dict, current_user: User = Depends(get_current_active_user)):
+    try:
+        item_name = body["item_name"]
+        updated_item = body["updated_item"]
+        if current_user.role == "admin":
+            update_item(engine, model_of_item, item_name, updated_item)
+        else:
             raise HTTPException(
-                status_code=400,
-                detail=f"{er}"
+                status_code=403,
+                detail="You don't have permission to do that."
             )
-    else:
+    except NoResultFound as er:
+        logger.error(er)
         raise HTTPException(
-            status_code=403,
-            detail="You have no permission to do that."
+            status_code=400,
+            detail=f"{er}"
         )
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
 
 
 @router.post("/delete_item")
 async def del_item(body: dict, current_user: User = Depends(get_current_active_user)):
-    item_name = body["item_name"]
-    if current_user.role == "admin":
-        try:
+    try:
+        item_name = body["item_name"]
+        if current_user.role == "admin":
             delete_item(engine, model_of_item, item_name)
-        except NoResultFound as er:
-            logger.error(er)
+            return Response(status_code=200, content="OK")
+        else:
             raise HTTPException(
-                status_code=400,
-                detail=f"{er}"
+                status_code=403,
+                detail="You have no permission to do that."
             )
-    else:
+    except NoResultFound as er:
+        logger.error(er)
         raise HTTPException(
-            status_code=403,
-            detail="You have no permission to do that."
+            status_code=400,
+            detail=f"{er}"
         )
-    return Response(status_code=200, content="OK")
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY

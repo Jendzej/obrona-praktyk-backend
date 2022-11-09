@@ -29,24 +29,26 @@ async def get_transactions(current_user: User = Depends(get_current_active_user)
 
 @router.post("/add_transaction")
 async def add_transaction(body: dict, current_user: User = Depends(get_current_active_user)):
-    items = body['items']
-    payment_status = body['payment_status']
-    tr_time = datetime.datetime.today()
-    for item in items:
-        try:
+    try:
+        items = body['items']
+        payment_status = body['payment_status']
+        tr_time = datetime.datetime.today()
+        for item in items:
             insert_transaction(engine, model_of_transaction, user=current_user.username, item=item,
                                payment_status=payment_status, transaction_time=tr_time)
-        except IntegrityError as IE:
-            logger.error(IE)
-            raise status.HTTP_422_UNPROCESSABLE_ENTITY
-
+    except IntegrityError as IE:
+        logger.error(IE)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
 
 
 @router.post("/delete_transaction")
 async def del_transaction(body: dict):
-    transaction_time = body["transaction_time"]
     try:
+        transaction_time = body["transaction_time"]
         delete_transaction(engine, model_of_transaction, transaction_time)
         logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
     except NoResultFound:
@@ -55,4 +57,7 @@ async def del_transaction(body: dict):
             status_code=400,
             detail="Bad request, cannot find data."
         )
+    except KeyError as er:
+        logger.error(er)
+        raise status.HTTP_422_UNPROCESSABLE_ENTITY
     return Response(status_code=200, content="OK")
