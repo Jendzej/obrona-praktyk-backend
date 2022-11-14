@@ -33,9 +33,10 @@ async def add_transaction(body: dict, current_user: User = Depends(get_current_a
         items = body['items']
         payment_status = body['payment_status']
         tr_time = datetime.datetime.today()
+        del_time = body["delivery_time"]
         for item in items:
             insert_transaction(engine, model_of_transaction, user=current_user.username, item=item,
-                               payment_status=payment_status, transaction_time=tr_time)
+                               payment_status=payment_status, transaction_time=tr_time, delivery_time=del_time)
     except IntegrityError as IE:
         logger.error(IE)
         raise status.HTTP_422_UNPROCESSABLE_ENTITY

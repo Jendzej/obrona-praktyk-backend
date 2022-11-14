@@ -61,13 +61,14 @@ def insert_user(engine, user_model, username: str, email: str, first_name: str, 
 
 
 def insert_transaction(engine, transaction_model, user: str, item: str, payment_status: str,
-                       transaction_time: datetime):
+                       transaction_time: datetime, delivery_time: datetime):
     session = create_session(engine)
     to_add = transaction_model(
         user=user,
         item=item,
         payment_status=payment_status,
-        transaction_time=transaction_time
+        transaction_time=transaction_time,
+        delivery_time=delivery_time
     )
     session.add(to_add)
     try:
