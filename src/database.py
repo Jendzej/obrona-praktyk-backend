@@ -42,5 +42,3 @@ class Database:
                 continue
 
         return logger.info("Connected")
-
-    # def get_models(self):

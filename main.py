@@ -7,7 +7,8 @@ Base = declarative_base()
 db.connecting_db()
 db.init.create_tables(Base)
 engine = db.engine
-models = db.models
+models = db.models[1]
+other_models = db.models[0]
 
 if __name__ == "__main__":
     uvicorn.run(

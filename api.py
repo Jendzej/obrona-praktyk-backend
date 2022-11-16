@@ -6,6 +6,7 @@ from src.routers.auth import router as authentication_router
 from src.routers.items import router as item_router
 from src.routers.transactions import router as transaction_router
 from src.routers.users import router as user_router
+from src.routers.school_classes import router as school_class_router
 
 load_dotenv()
 
@@ -23,6 +24,7 @@ app.include_router(authentication_router)
 app.include_router(transaction_router)
 app.include_router(user_router)
 app.include_router(item_router)
+app.include_router(school_class_router)
 
 """
 SAMPLE BODIES

@@ -98,4 +98,4 @@ class Init:
             logger.info("Inserted database start data")
         except IntegrityError:
             logger.info("Database start data already exists, skipping insertion")
-        return model_list[1]
+        return model_list
