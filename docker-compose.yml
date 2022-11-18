@@ -8,6 +8,6 @@ services:
     ports:
       - "5432:5432"
       - "15432:15432"
-      #volumes:
-      #- ./data/db:/var/lib/postgresql/data
-      #- ./conf/:/var/lib/postgresql/data/
+    volumes:
+    - db:/var/lib/postgresql/data
+    #- ./conf/:/var/lib/postgresql/data/

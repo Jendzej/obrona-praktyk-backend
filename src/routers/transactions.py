@@ -1,5 +1,3 @@
-import datetime
-
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -21,19 +19,18 @@ router = APIRouter(
 model_of_transaction = models[2]
 
 
-@router.get('/get_transactions')
+@router.get('')
 async def get_transactions(current_user: User = Depends(get_current_active_user)):
+    """ Fetch all transactions for current user """
     results = fetch_users_transactions(engine, model_of_transaction, username=current_user.username)
     return results
 
 
-@router.post("/add_transaction")
+@router.post("")
 async def add_transaction(body: dict, current_user: User = Depends(get_current_active_user)):
+    """ Add transaction from POST body """
     try:
-        items = body['items']
-        payment_status = body['payment_status']
-        tr_time = datetime.datetime.today()
-        del_time = body["delivery_time"]
+        items, payment_status, tr_time, del_time = body.values()
         for item in items:
             insert_transaction(engine, model_of_transaction, user=current_user.username, item=item,
                                payment_status=payment_status, transaction_time=tr_time, delivery_time=del_time)
@@ -46,10 +43,11 @@ async def add_transaction(body: dict, current_user: User = Depends(get_current_a
     return Response(status_code=200, content="OK")
 
 
-@router.post("/delete_transaction")
-async def del_transaction(body: dict):
+@router.delete("{transaction_id}")
+async def del_transaction(transaction_id: int):
+    """ Delete transaction by transaction_id """
     try:
-        transaction_time = body["transaction_time"]
+        transaction_time = transaction_id  # TODO: time => id
         delete_transaction(engine, model_of_transaction, transaction_time)
         logger.debug(f"Transaction at '{transaction_time}' successfully deleted!")
     except NoResultFound:

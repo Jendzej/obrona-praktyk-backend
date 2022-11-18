@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-
+from fastapi import Body
 
 def create_models(engine, base):
     """Creating models in db"""
@@ -93,3 +93,20 @@ class User(BaseModel):
 
 class UserInDb(User):
     hashed_password: str
+
+
+example_User = Body(example={
+    "username": "user",
+    "email": "email",
+    "first_name": "First",
+    "last_name": "Last",
+    "password": "password",
+    "school_class": "4TIP"
+})
+
+example_Item = Body(example={
+    "item_name": "item1",
+    "item_price": 4.5,
+    "item_description": "Description of item 1",
+    "item_image_url": "url1"
+})

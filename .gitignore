@@ -1,5 +1,4 @@
 .env
-Pipfile
 Pipfile.lock
 .idea/
 data/

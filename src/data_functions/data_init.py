@@ -5,7 +5,7 @@ from src.log import logger
 from src.models import create_models
 
 
-class Init:
+class DataInit:
     def __init__(self, engine):
         self.engine = engine
 

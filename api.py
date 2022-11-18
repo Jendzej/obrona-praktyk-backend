@@ -20,31 +20,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(authentication_router)
-app.include_router(transaction_router)
-app.include_router(user_router)
-app.include_router(item_router)
-app.include_router(school_class_router)
-
-"""
-SAMPLE BODIES
-
-USER:
-{
-"username":"user",
-"email":"email",
-"first_name":"First",
-"last_name":"Last",
-"password":"password",
-"school_class":"4TIP"
-}
-
-ITEM:
-{
-"item_name":"item1",
-"item_price": 4.5,
-"item_description": "Description of item 1",
-"item_image_url": "url1"
-}
-
-"""
+app.include_router(authentication_router, prefix='/auth')
+app.include_router(transaction_router, prefix='/transaction')
+app.include_router(user_router, prefix='/user')
+app.include_router(item_router, prefix='/item')
+app.include_router(school_class_router, prefix='/school_class')

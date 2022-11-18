@@ -11,6 +11,7 @@ router = APIRouter(
 school_class_model = other_models[0]
 
 
-@router.post('/get_classes')
-async def get_classes():
+@router.get('')
+async def get_school_classes():
+    """ Fetch all school classes """
     return fetch_all(engine, school_class_model)

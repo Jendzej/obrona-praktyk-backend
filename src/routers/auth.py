@@ -15,7 +15,7 @@ from src.models import TokenData, User, UserInDb, Token
 
 load_dotenv()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 router = APIRouter(
     tags=['auth']
@@ -103,8 +103,9 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 
-@router.post("/token", response_model=Token)
+@router.post("", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """ Returns JWT token for authorized user """
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         logger.error("HTTP_401_UNAUTHORIZED - Incorrect username or password")
