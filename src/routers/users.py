@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from main import engine, models
 from src.data_functions.data_delete import delete_user
-from src.data_functions.data_fetch import fetch_all, fetch_user
+from src.data_functions.data_fetch import fetch_all, fetch_user_by_id
 from src.data_functions.data_insert import insert_user
 from src.data_functions.data_update import update_user
 from src.log import logger
@@ -45,14 +45,14 @@ async def startup():
 @router.get("/{user_id}")
 async def get_user_by_id(user_id: int):
     """ Fetch one user by user_id """
-    return fetch_user(engine, model_of_user, user_id)
+    return fetch_user_by_id(engine, model_of_user, user_id)
 
 
 @router.get("")
-async def get_user(current_user: User = Depends(get_current_active_user)):
+async def get_user_current(current_user: User = Depends(get_current_active_user)):
     """ Fetch current user """
     try:
-        data = fetch_user(engine, model_of_user, current_user.username)
+        data = fetch_user_by_id(engine, model_of_user, current_user.id)
     except IntegrityError as er:
         logger.error(er)
         raise status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -77,6 +77,7 @@ async def add_user(body: dict = example_User):
     """ Add user from POST body """
     try:
         username, email, first_name, last_name, password, school_class = body.values()
+
         hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
         insert_user(engine, model_of_user, username, email, first_name, last_name, hashed_password, 'user',
                     school_class)
@@ -94,12 +95,17 @@ async def add_user(body: dict = example_User):
 
 
 @router.put('/{user_id}')
-async def user_update(body: dict = None, current_user: User = Depends(get_current_active_user)):
+async def user_update(body: dict = None, user_id: int = None, current_user: User = Depends(get_current_active_user)):
     """ Update user by user_id """
     try:
         updated_user = body["updated_user"]
-        if updated_user["username"] == current_user.username or current_user.role == "admin":  # TODO: username => id
-            update_user(engine, model_of_user, current_user.username, updated_user)
+        if user_id == current_user.id or current_user.role == "admin":
+            if 'password' in updated_user.keys():
+                update_user(engine, model_of_user, user_id, updated_user)
+            else:
+                password = body["password"]
+                update_user(engine, model_of_user, user_id, updated_user, password)
+
     except KeyError as er:
         logger.error(er)
         raise status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -110,9 +116,8 @@ async def user_update(body: dict = None, current_user: User = Depends(get_curren
 async def del_user(user_id: int, current_user: User = Depends(get_current_active_user)):
     """ Delete user by user_id """
     try:
-        username = user_id  # TODO: name => id
-        if username == current_user.username or current_user.role == "admin":
-            delete_user(engine, model_of_user, username)
+        if current_user.id == user_id or current_user.role == "admin":
+            delete_user(engine, model_of_user, user_id)
     except KeyError as er:
         logger.error(er)
         raise status.HTTP_422_UNPROCESSABLE_ENTITY

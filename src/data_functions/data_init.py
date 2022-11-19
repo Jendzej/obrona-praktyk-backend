@@ -67,7 +67,7 @@ class DataInit:
             model_roles(role="user"),
 
             model_payment_status(status="paid"),
-            model_payment_status(status="not paid"),
+            model_payment_status(status="not_paid"),
             model_payment_status(status="pending"),
             model_payment_status(status="other"),
 

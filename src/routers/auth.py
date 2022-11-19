@@ -9,9 +9,9 @@ from passlib.context import CryptContext
 from sqlalchemy.exc import NoResultFound
 
 from main import engine, models
-from src.data_functions.data_fetch import fetch_user
+from src.data_functions.data_fetch import fetch_user_by_username
 from src.log import logger
-from src.models import TokenData, User, UserInDb, Token
+from src.models import TokenData, User, Token
 
 load_dotenv()
 
@@ -55,7 +55,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def get_user(username: str):
     try:
-        user = fetch_user(engine, model_of_user, username)
+        user = fetch_user_by_username(engine, model_of_user, username)
     except NoResultFound:
         logger.error(f"No result found, HTTP_400_BAD_REQUEST - This username does not exist '{username}'")
         raise HTTPException(
@@ -63,14 +63,14 @@ def get_user(username: str):
             detail="This username does not exist",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    return UserInDb(username=user.username, mail=user.email, role=user.role, hashed_password=user.password)
+    return user
 
 
 def authenticate_user(username: str, password: str):
     user = get_user(username)
     if not user:
         return False
-    if not verify_password(username, password, user.hashed_password):
+    if not verify_password(username, password, user.password):
         return False
     return user
 

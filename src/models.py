@@ -1,7 +1,8 @@
+from fastapi import Body
 from pydantic import BaseModel
 from sqlalchemy import Sequence, Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from fastapi import Body
+
 
 def create_models(engine, base):
     """Creating models in db"""
@@ -47,7 +48,7 @@ def create_models(engine, base):
 
     class Users(base):
         __tablename__ = "users"
-        id = Column(Integer, user_id_sequence, server_default=user_id_sequence.next_value())
+        id = Column(Integer, user_id_sequence, server_default=user_id_sequence.next_value(), unique=True)
         username = Column(String(20), primary_key=True)
         email = Column(String(50), unique=True)
         first_name = Column(String(30))
@@ -63,14 +64,14 @@ def create_models(engine, base):
     class Transactions(base):
         __tablename__ = "transactions"
         id = Column(Integer, transaction_sequence, primary_key=True, server_default=transaction_sequence.next_value())
-        user = Column(String, ForeignKey("users.username", onupdate='CASCADE', ondelete='CASCADE'))
-        item = Column(String, ForeignKey("items.item_name", onupdate='CASCADE', ondelete='CASCADE'))
+        user_id = Column(Integer, ForeignKey("users.id", onupdate='CASCADE', ondelete='CASCADE'))
+        item_id = Column(Integer, ForeignKey("items.id", onupdate='CASCADE', ondelete='CASCADE'))
         payment_status = Column(String, ForeignKey("payment_status.status"))
         transaction_time = Column(DateTime)
         delivery_time = Column(DateTime)
 
         def __repr__(self):
-            return f"<Transactions(id={self.id}, user={self.user}, item={self.item}, payment_status={self.payment_status}, transaction_time={self.transaction_time}, delivery_time={self.delivery_time})>"
+            return f"<Transactions(id={self.id}, user_id={self.user_id}, item_id={self.item_id}, payment_status={self.payment_status}, transaction_time={self.transaction_time}, delivery_time={self.delivery_time})>"
 
     base.metadata.create_all(engine)
     return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions]]
@@ -86,13 +87,10 @@ class TokenData(BaseModel):
 
 
 class User(BaseModel):
+    id: int
     username: str
     mail: str
     role: str
-
-
-class UserInDb(User):
-    hashed_password: str
 
 
 example_User = Body(example={
@@ -109,4 +107,10 @@ example_Item = Body(example={
     "item_price": 4.5,
     "item_description": "Description of item 1",
     "item_image_url": "url1"
+})
+
+example_Transaction = Body(example={
+    "items": [1, 2, 3],
+    "payment_status": "paid",
+    "del_time": "2022-11-18 10:30"
 })

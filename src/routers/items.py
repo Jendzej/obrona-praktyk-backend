@@ -30,8 +30,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 async def get_item(item_id: int, current_user: User = Depends(get_current_active_user)):
     """ Fetch one item by item_id """
     try:
-        item_name = item_id  # TODO: name => id
-        results = fetch_item(engine, model_of_item, item_name)
+        results = fetch_item(engine, model_of_item, item_id)
         return results
     except NoResultFound as er:
         logger.error(er)
@@ -85,9 +84,9 @@ async def add_item(body: dict = example_Item, current_user: User = Depends(get_c
 async def item_update(item_id: int, body: dict, current_user: User = Depends(get_current_active_user)):
     """ Update item by item_id """
     try:
-        item_name, updated_item = body.values()  # TODO: name => id
+        updated_item = body["updated_user"]
         if current_user.role == "admin":
-            update_item(engine, model_of_item, item_name, updated_item)
+            update_item(engine, model_of_item, item_id, updated_item)
         else:
             return HTTPException(
                 status_code=403,
@@ -112,9 +111,8 @@ async def item_update(item_id: int, body: dict, current_user: User = Depends(get
 async def del_item(item_id: int, current_user: User = Depends(get_current_active_user)):
     """ Delete item by item_id """
     try:
-        item_name = item_id
         if current_user.role == "admin":
-            delete_item(engine, model_of_item, item_name)  # TODO: name => id
+            delete_item(engine, model_of_item, item_id)
             return Response(status_code=200, content="OK")
         else:
             return HTTPException(

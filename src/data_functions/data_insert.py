@@ -60,12 +60,12 @@ def insert_user(engine, user_model, username: str, email: str, first_name: str, 
         raise IE
 
 
-def insert_transaction(engine, transaction_model, user: str, item: str, payment_status: str,
+def insert_transaction(engine, transaction_model, user_id: int, item_id: int, payment_status: str,
                        transaction_time: datetime, delivery_time: datetime):
     session = create_session(engine)
     to_add = transaction_model(
-        user=user,
-        item=item,
+        user_id=user_id,
+        item_id=item_id,
         payment_status=payment_status,
         transaction_time=transaction_time,
         delivery_time=delivery_time
