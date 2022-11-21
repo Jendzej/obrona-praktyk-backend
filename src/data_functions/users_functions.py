@@ -1,7 +1,15 @@
+import os
+
+from dotenv import load_dotenv
+from jose import jwt
+
 from main import engine, models
 from src.data_functions import session
 from src.log import logger
-from src.routers.auth import create_access_token, decode_password
+
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 
 class UserFunction:
@@ -13,6 +21,17 @@ class UserFunction:
         """Get user from database by id"""
         try:
             data = self.session.query(self.user_model).filter(self.user_model.id == user_id).one()
+            self.session.close()
+            return data
+        except Exception as er:
+            self.session.close()
+            logger.error(er)
+            return False
+
+    def get_by_username(self, username):
+        """Get user from database by username"""
+        try:
+            data = self.session.query(self.user_model).filter(self.user_model.username == username).one()
             self.session.close()
             return data
         except Exception as er:
@@ -56,16 +75,16 @@ class UserFunction:
             user_to_update = self.session.query(self.user_model).filter(self.user_model.id == user_id).one()
             if 'username' in new_user_data.keys():
                 if 'password' in new_user_data.keys():
-                    new_user_data['password'] = create_access_token(
-                        {new_user_data['username']: new_user_data['password']})
+                    new_user_data['password'] = jwt.encode(
+                        {new_user_data['username']: new_user_data['password']}, SECRET_KEY, ALGORITHM)
                 else:
-                    old_password = decode_password(user_to_update.password)
-                    new_user_data['password'] = create_access_token(
-                        {new_user_data['username']: old_password[user_to_update.username]})
+                    old_password = jwt.decode(user_to_update.password, SECRET_KEY, ALGORITHM)
+                    new_user_data['password'] = jwt.encode(
+                        {new_user_data['username']: old_password[user_to_update.username]}, SECRET_KEY, ALGORITHM)
             else:
                 if 'password' in new_user_data.keys():
-                    new_user_data['password'] = create_access_token(
-                        {user_to_update.username: new_user_data['password']})
+                    new_user_data['password'] = jwt.encode(
+                        {user_to_update.username: new_user_data['password']}, SECRET_KEY, ALGORITHM)
             self.session.query(self.user_model).filter(self.user_model.id == user_id).update(new_user_data)
             self.session.commit()
             self.session.close()
