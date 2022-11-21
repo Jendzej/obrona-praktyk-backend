@@ -48,7 +48,8 @@ def create_models(engine, base):
 
     class Users(base):
         __tablename__ = "users"
-        id = Column(Integer, user_id_sequence, server_default=user_id_sequence.next_value(), unique=True)
+        id = Column(Integer, user_id_sequence, primary_key=True, server_default=user_id_sequence.next_value(),
+                    unique=True)
         username = Column(String(20), primary_key=True)
         email = Column(String(50), unique=True)
         first_name = Column(String(30))

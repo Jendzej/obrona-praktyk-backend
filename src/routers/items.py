@@ -1,15 +1,9 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, HTTPException
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from fastapi import APIRouter, Depends, Response
 
-from main import engine, models
-from src.data_functions.data_delete import delete_item
-from src.data_functions.data_fetch import fetch_item, fetch_all
-from src.data_functions.data_insert import insert_item
-from src.data_functions.data_update import update_item
-from src.log import logger
+from src.data_functions.items_functions import ItemFunction
 from src.models import User
 from src.models import example_Item
 from src.routers.auth import get_current_active_user
@@ -19,7 +13,7 @@ load_dotenv()
 router = APIRouter(
     tags=["items"]
 )
-model_of_item = models[0]
+item = ItemFunction()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -27,32 +21,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 @router.get("/{item_id}")
-async def get_item(item_id: int, current_user: User = Depends(get_current_active_user)):
+async def fetch_item(item_id: int, current_user: User = Depends(get_current_active_user)):
     """ Fetch one item by item_id """
-    try:
-        results = fetch_item(engine, model_of_item, item_id)
-        return results
-    except NoResultFound as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=400, detail=f"{er}"
-        )
-    except KeyError as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=422, detail=f"{er}"
-        )
+    return item.get(item_id)
 
 
-@router.get("")
-async def get_all_items():
+@router.get("/all/")
+async def fetch_all_items():
     """ Fetch all items """
-    results = fetch_all(engine, model_of_item)
-    if len(results) == 0:
-        return HTTPException(
-            status_code=200, detail="OK, Nothing to show"
-        )
-    return results
+    return item.get_all()
 
 
 @router.post("")
@@ -61,73 +38,39 @@ async def add_item(body: dict = example_Item, current_user: User = Depends(get_c
     try:
         item_name, item_price, item_description, item_image_url = body.values()
         if current_user.role == "admin":
-            insert_item(engine, model_of_item, item_name, item_price, item_description, item_image_url)
-            return Response(status_code=200, content="OK")
+            if item.insert(item_name, item_price, item_description, item_image_url):
+                return Response(status_code=200, content=f"Successfully added item {item_name}")
+            else:
+                return Response(status_code=404, content="Bad request, item was not added")
         else:
-            return HTTPException(
-                status_code=403,
-                detail="You don't have permissions to do that."
-            )
-    except IntegrityError as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=400, detail=f"{er}"
-        )
-    except KeyError as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=422, detail=f"{er}"
-        )
+            return Response(status_code=401, content="You have no permissions to do that!")
+    except Exception as er:
+        return Response(status_code=422, content=f"Unprocessable entity, {er}")
 
 
 @router.put("/{item_id}")
 async def item_update(item_id: int, body: dict, current_user: User = Depends(get_current_active_user)):
     """ Update item by item_id """
     try:
-        updated_item = body["updated_user"]
         if current_user.role == "admin":
-            update_item(engine, model_of_item, item_id, updated_item)
+            if item.update(item_id, body["updated_item"]):
+                return Response(status_code=200, content=f"Successfully updated item with id {item_id}")
+            else:
+                return Response(status_code=404, content="Bad request, item was not added")
         else:
-            return HTTPException(
-                status_code=403,
-                detail="You don't have permission to do that."
-            )
-    except NoResultFound as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=400,
-            detail=f"{er}"
-        )
-    except KeyError as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=422,
-            detail=f"{er}"
-        )
-    return Response(status_code=200, content="OK")
+            return Response(status_code=401, content=f"You have no permissions to do that!")
+    except Exception as er:
+        print(er)
+        return Response(status_code=422, content=f"Something went wrong..., {er}")
 
 
 @router.delete("/{item_id}")
 async def del_item(item_id: int, current_user: User = Depends(get_current_active_user)):
     """ Delete item by item_id """
-    try:
-        if current_user.role == "admin":
-            delete_item(engine, model_of_item, item_id)
-            return Response(status_code=200, content="OK")
+    if current_user.role == "admin":
+        if item.delete(item_id):
+            return Response(status_code=200, content=f"Successfully deleted item with id {item_id}")
         else:
-            return HTTPException(
-                status_code=403,
-                detail="You have no permission to do that."
-            )
-    except NoResultFound as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=400,
-            detail=f"{er}"
-        )
-    except KeyError as er:
-        logger.error(er)
-        return HTTPException(
-            status_code=422,
-            detail=f"{er}"
-        )
+            return Response(status_code=400, content="Item does not exists or something goes wrong")
+    else:
+        return Response(status_code=401, content="You have no access to do that!")

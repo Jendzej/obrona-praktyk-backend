@@ -67,6 +67,7 @@ class UserFunction:
                     new_user_data['password'] = create_access_token(
                         {user_to_update.username: new_user_data['password']})
             self.session.query(self.user_model).filter(self.user_model.id == user_id).update(new_user_data)
+            self.session.commit()
             self.session.close()
             return True
         except Exception as er:
