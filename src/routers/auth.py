@@ -30,11 +30,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 def verify_password(username, plain_password, hashed_password):
-    decoded_hashed = jwt.decode(hashed_password, SECRET_KEY, ALGORITHM)
+    decoded_hashed = decode_password(hashed_password)
     if decoded_hashed[username] == plain_password:
         return True
     else:
         return False
+
+
+def decode_password(hashed_password):
+    return jwt.decode(hashed_password, SECRET_KEY, ALGORITHM)
 
 
 def get_password_hash(password):

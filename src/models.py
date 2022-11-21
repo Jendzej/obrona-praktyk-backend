@@ -59,7 +59,7 @@ def create_models(engine, base):
         transaction_item = relationship('Items', secondary='transactions', backref='transaction_items')
 
         def __repr__(self):
-            return f"<Users(username={self.username}, email={self.email}, first_name={self.first_name}, last_name={self.last_name}, password={self.password}, role={self.role}, school_class={self.school_class})>"
+            return f"<Users(id={self.id}, username={self.username}, email={self.email}, first_name={self.first_name}, last_name={self.last_name}, password={self.password}, role={self.role}, school_class={self.school_class})>"
 
     class Transactions(base):
         __tablename__ = "transactions"
