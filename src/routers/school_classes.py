@@ -1,17 +1,17 @@
 from dotenv import load_dotenv
 from fastapi import APIRouter
-from src.data_functions.data_fetch import fetch_all
-from main import engine, other_models
+
+from src.data_functions.school_class_functions import SchoolClassFunction
 
 load_dotenv()
 
 router = APIRouter(
     tags=["school_classes"]
 )
-school_class_model = other_models[0]
+school_class = SchoolClassFunction()
 
 
 @router.get('')
 async def get_school_classes():
     """ Fetch all school classes """
-    return fetch_all(engine, school_class_model)
+    return school_class.get_all()

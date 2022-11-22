@@ -1,4 +1,5 @@
 import os
+import time
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Depends
@@ -32,10 +33,12 @@ async def startup():
     password = os.getenv("PAGE_ADMIN_PASSWORD")
     email = os.getenv("PAGE_ADMIN_EMAIL")
     hashed_password = jwt.encode({username: password}, SECRET_KEY, ALGORITHM)
-    try:
-        user.insert(username, email, username, username, hashed_password, "admin", "1TIP", True)
-    except Exception as er:
-        logger.info("Db contains admin account already")
+
+    for i in range(3):
+        if user.insert(username, email, username, username, hashed_password, "admin", "1TIP", True):
+            logger.debug(f"Successfully added startup user '{username}'!")
+            break
+        time.sleep(0.3)
 
 
 @router.get("/{user_id}")

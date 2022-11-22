@@ -25,7 +25,7 @@ class ItemFunction:
         self.session.close()
         return data
 
-    def insert(self, item_name, item_price, item_description, item_image_url, raise_err=False):
+    def insert(self, item_name, item_price, item_description, item_image_url, skip_err=False):
         """Add item to database"""
         try:
             self.session.add(self.item_model(
@@ -39,11 +39,9 @@ class ItemFunction:
             return True
         except Exception as er:
             self.session.close()
-            if raise_err:
-                raise er
-            else:
+            if not skip_err:
                 logger.error(er)
-                return False
+            return False
 
     def update(self, item_id, new_item_data: dict):
         """Update item with new_item_data. Returns bool - False when error, True when successfully updated"""

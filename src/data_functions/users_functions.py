@@ -45,7 +45,7 @@ class UserFunction:
         self.session.close()
         return data
 
-    def insert(self, username, email, first_name, last_name, password, role, school_class, raise_err=False):
+    def insert(self, username, email, first_name, last_name, password, role, school_class, skip_err=False):
         """Add user to database"""
         try:
             self.session.add(self.user_model(
@@ -62,11 +62,9 @@ class UserFunction:
             return True
         except Exception as er:
             self.session.close()
-            if raise_err:
-                raise er
-            else:
+            if not skip_err:
                 logger.error(er)
-                return False
+            return False
 
     def update(self, user_id, new_user_data: dict):
         """Update user with new_user_data. If new_user_data (dict) contains username - password

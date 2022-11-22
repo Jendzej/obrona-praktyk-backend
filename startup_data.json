@@ -1,0 +1,55 @@
+{
+  "school_class": [
+    "1TIP",
+    "1TI1",
+    "1TI2",
+    "1TR",
+    "1TET",
+    "2TI1",
+    "2TI2",
+    "2TR",
+    "2TET",
+    "3TI1",
+    "3TI2",
+    "3TR",
+    "3TET",
+    "4TI1",
+    "4TI2",
+    "4TR",
+    "4TET",
+    "4TIP",
+    "4TEP",
+    "4TRP",
+    "AAAAAA"
+  ],
+  "role": [
+    "admin",
+    "user"
+  ],
+  "payment_status": [
+    "paid",
+    "not_paid",
+    "pending",
+    "other"
+  ],
+  "item": [
+    [
+      "Bułka z kurczakiem",
+      4.5,
+      "Bułka z panierowanym kurczakiem, sałatą i sosem",
+      "url"
+    ],
+    [
+      "Bagietka czosnkowa",
+      2.5,
+      "Bagietka z maslem czosnkowym",
+      "url2"
+    ],
+    [
+      "Drozdzowka z kruszonka",
+      3.29,
+      "Drozdzowka z kruszonka i lukrem",
+      "url3"
+    ]
+  ]
+}

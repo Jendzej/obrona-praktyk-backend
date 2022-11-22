@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Response
 
+from main import startup_items
 from src.data_functions.items_functions import ItemFunction
+from src.log import logger
 from src.models import User
 from src.models import example_Item
 from src.routers.auth import get_current_active_user
@@ -19,6 +21,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
+
+@router.on_event("startup")
+async def startup():
+    for single_item in startup_items:
+        name, price, description, url = single_item
+        if item.insert(name, price, description, url, True):
+            logger.debug(f"Successfully added item '{name}' to items!")
+ 
 
 @router.get("/{item_id}")
 async def fetch_item(item_id: int, current_user: User = Depends(get_current_active_user)):
