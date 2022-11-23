@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from sqlalchemy.exc import NoResultFound
 
 from main import models
-from src.data_functions.users_functions import UserFunction
+from src.data_functions.user import UserFunction
 from src.log import logger
 from src.models import TokenData, User, Token
 

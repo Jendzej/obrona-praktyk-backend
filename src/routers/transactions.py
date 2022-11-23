@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Response
 
 from main import models
-from src.data_functions.transaction_functions import TransactionFunction
+from src.data_functions.transaction import TransactionFunction
 from src.log import logger
 from src.models import User, example_Transaction
 from src.routers.auth import get_current_active_user

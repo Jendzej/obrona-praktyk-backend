@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import APIRouter
 
-from src.data_functions.school_class_functions import SchoolClassFunction
+from src.data_functions.school_class import SchoolClassFunction
 
 load_dotenv()
 

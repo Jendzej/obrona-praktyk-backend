@@ -6,7 +6,7 @@ from fastapi import APIRouter, Response, Depends
 from jose import jwt
 
 from main import models
-from src.data_functions.users_functions import UserFunction
+from src.data_functions.user import UserFunction
 from src.log import logger
 from src.models import User
 from src.models import example_User
@@ -36,7 +36,7 @@ async def startup():
 
     for i in range(3):
         if user.insert(username, email, username, username, hashed_password, "admin", "1TIP", True):
-            logger.debug(f"Successfully added startup user '{username}'!")
+            logger.info(f"Successfully added startup user '{username}'!")
             break
         time.sleep(0.3)
 
