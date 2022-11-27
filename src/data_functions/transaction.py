@@ -7,6 +7,7 @@ class TransactionFunction:
     def __init__(self):
         self.session = session.create_session(engine)
         self.transaction_model = models[2]
+        self.item_model = models[0]
 
     def get(self, transaction_id):
         """Get transaction from database by id"""
@@ -28,12 +29,14 @@ class TransactionFunction:
     def insert(self, user_id, item_id, payment_status, transaction_time, delivery_time):
         """Add transaction to database"""
         try:
+            item = self.session.query(self.item_model).filter(self.item_model.id == item_id).one()
             self.session.add(self.transaction_model(
                 user_id=user_id,
                 item_id=item_id,
                 payment_status=payment_status,
                 transaction_time=transaction_time,
-                delivery_time=delivery_time
+                delivery_time=delivery_time,
+                item_price=item.item_price
             ))
             self.session.commit()
             self.session.close()

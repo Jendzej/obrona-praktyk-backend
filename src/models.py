@@ -70,9 +70,10 @@ def create_models(engine, base):
         payment_status = Column(String, ForeignKey("payment_status.status"))
         transaction_time = Column(DateTime)
         delivery_time = Column(DateTime)
+        item_price = Column(Float)
 
         def __repr__(self):
-            return f"<Transactions(id={self.id}, user_id={self.user_id}, item_id={self.item_id}, payment_status={self.payment_status}, transaction_time={self.transaction_time}, delivery_time={self.delivery_time})>"
+            return f"<Transactions(id={self.id}, user_id={self.user_id}, item_id={self.item_id}, payment_status={self.payment_status}, transaction_time={self.transaction_time}, delivery_time={self.delivery_time}, item_price={self.item_price})>"
 
     base.metadata.create_all(engine)
     return [[SchoolClasses, Roles, PaymentStatus], [Items, Users, Transactions]]

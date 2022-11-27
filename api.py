@@ -23,7 +23,7 @@ app.add_middleware(
     # allow_origins=os.getenv('FRONTEND_ORIGIN'),
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["POST", "GET"],
+    allow_methods=["POST", "GET", "PUT", "DELETE"],
     allow_headers=["*"]
 )
 
