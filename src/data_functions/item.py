@@ -1,3 +1,4 @@
+"""Functions to add/delete/edit/fetch users from database"""
 from main import engine, models
 from src.data_functions import session
 from src.log import logger
@@ -44,9 +45,11 @@ class ItemFunction:
             return False
 
     def update(self, item_id, new_item_data: dict):
-        """Update item with new_item_data. Returns bool - False when error, True when successfully updated"""
+        """Update item with new_item_data. Returns bool -
+         False when error, True when successfully updated"""
         try:
-            self.session.query(self.item_model).filter(self.item_model.id == item_id).update(new_item_data)
+            self.session.query(self.item_model).filter(
+                self.item_model.id == item_id).update(new_item_data)
             self.session.commit()
             self.session.close()
             return True

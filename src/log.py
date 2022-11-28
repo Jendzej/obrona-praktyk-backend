@@ -1,3 +1,4 @@
+"""Logger which saves data to logs/ directory"""
 import logging
 import os
 from pathlib import Path

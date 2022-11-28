@@ -1,8 +1,9 @@
+"""API endpoints, routers, hosts, paths, methods, etc. configuration"""
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from main import startup_school_class, startup_roles, startup_payment_status
+from main import startup_class, startup_roles, startup_status
 from src.data_functions.school_class import SchoolClassFunction
 from src.data_functions.status_and_roles import StatusRoleFunctions
 from src.log import logger
@@ -30,15 +31,16 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
-    for single_school_class in startup_school_class:
+    """Inserting some data to database on API startup"""
+    for single_school_class in startup_class:
         if school_class.insert(single_school_class, True):
-            logger.info(f"Successfully added '{single_school_class}' to school classes!")
+            logger.info("Successfully added '%s' to school classes!", single_school_class)
     for single_role in startup_roles:
         if status_role_function.insert_role(single_role):
-            logger.info(f"Successfully adedd `{single_role}` to roles!")
-    for single_status in startup_payment_status:
+            logger.info("Successfully adedd `%s` to roles!", single_role)
+    for single_status in startup_status:
         if status_role_function.insert_status(single_status):
-            logger.info(f"Successfully added '{single_status}' to payment statuses!")
+            logger.info("Successfully added '%s' to payment statuses!", single_status)
 
 
 app.include_router(authentication_router, prefix='/auth')
