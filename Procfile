@@ -1,1 +1,1 @@
-web: uvicorn api:app --port $PORT
+web: python main.py
