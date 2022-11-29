@@ -1,6 +1,5 @@
 """Database initiation, models (tables) creation, run fastapi server on `python run`"""
 import json
-import os
 
 import uvicorn
 from dotenv import load_dotenv
@@ -25,5 +24,5 @@ if __name__ == "__main__":
         "api:app",
         host="0.0.0.0",
         reload=True,
-        port=os.getenv("PORT")
+        port=8000
     )
