@@ -2,6 +2,7 @@
 import time
 
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -15,10 +16,15 @@ class Database:
     """Database class"""
 
     def __init__(self, db_user, db_password, db_host, db_port, db_name):
-        self.engine = create_engine(
-            f"postgresql://{db_user}:{db_password}\@{db_host}:{db_port}/{db_name}",
-            pool_size=50,
-            max_overflow=20)
+        self.database_url = URL.create(
+            "postgresql",
+            username=db_user,
+            password=db_password,
+            host=db_host,
+            port=db_port,
+            database=db_name
+        )
+        self.engine = create_engine(self.database_url)
         self.base = declarative_base()
         self.models = create_models(self.engine, self.base)
 
