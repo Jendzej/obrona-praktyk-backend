@@ -9,6 +9,17 @@ class TransactionFunction:
         self.transaction_model = models[2]
         self.item_model = models[0]
 
+    def get_all(self):
+        """Get all transaction"""
+        try:
+            data = self.session.query(self.transaction_model).all()
+            self.session.close()
+            return data
+        except:
+            self.session.close()
+            logger.error(er)
+            return False
+
     def get(self, transaction_id):
         """Get transaction from database by id"""
         try:

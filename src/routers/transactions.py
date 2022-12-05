@@ -28,6 +28,15 @@ async def get_transactions(current_user: User = Depends(get_current_active_user)
         return Response(status_code=400, content="Bad request, something goes wrong")
 
 
+@router.get('all')
+async def get_all(current_user: User = Depends(get_current_active_user)):
+    data = transaction.get_all_transactions()
+    if current_user.role == "admin":
+        return data
+    else:
+        return Response(status_code=401, content="You have no permission to do that")
+
+
 @router.post("")
 async def add_transaction(body: dict = example_Transaction, current_user: User = Depends(get_current_active_user)):
     """ Add transaction from POST body """
