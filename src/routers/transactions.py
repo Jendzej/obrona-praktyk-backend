@@ -28,7 +28,7 @@ async def get_transactions(current_user: User = Depends(get_current_active_user)
         return Response(status_code=400, content="Bad request, something goes wrong")
 
 
-@router.get('all')
+@router.get('/all')
 async def get_all(current_user: User = Depends(get_current_active_user)):
     data = transaction.get_all_transactions()
     if current_user.role == "admin":

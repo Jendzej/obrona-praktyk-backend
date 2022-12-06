@@ -9,13 +9,13 @@ class TransactionFunction:
         self.transaction_model = models[2]
         self.item_model = models[0]
 
-    def get_all(self):
+    def get_all_transactions(self):
         """Get all transaction"""
         try:
             data = self.session.query(self.transaction_model).all()
             self.session.close()
             return data
-        except:
+        except Exception as er:
             self.session.close()
             logger.error(er)
             return False
