@@ -54,7 +54,7 @@ async def add_transaction(body: dict = example_Transaction, current_user: User =
         return Response(status_code=400, content=f"Something goes wrong, {er}")
 
 
-@router.put("{transaction_id}")
+@router.put("/{transaction_id}")
 async def update_transaction(body: dict, transaction_id: int, current_user: User = Depends(get_current_active_user)):
     """Update transaction with new data"""
     try:
@@ -67,7 +67,7 @@ async def update_transaction(body: dict, transaction_id: int, current_user: User
         return Response(status_code=400, content=f"Something goes wrong, {er}")
 
 
-@router.delete("{transaction_id}")
+@router.delete("/{transaction_id}")
 async def del_transaction(transaction_id: int, current_user: User = Depends(get_current_active_user)):
     """ Delete transaction by transaction_id """
     try:
