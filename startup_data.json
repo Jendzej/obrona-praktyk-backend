@@ -1,0 +1,66 @@
+{
+  "school_class": [
+    "1TIP",
+    "1TI1",
+    "1TI2",
+    "1TR",
+    "1TET",
+    "2TI1",
+    "2TI2",
+    "2TR",
+    "2TET",
+    "3TI1",
+    "3TI2",
+    "3TR",
+    "3TET",
+    "4TI1",
+    "4TI2",
+    "4TR",
+    "4TET",
+    "4TIP",
+    "4TEP",
+    "4TRP"
+  ],
+  "role": [
+    "admin",
+    "user"
+  ],
+  "payment_status": [
+    "paid",
+    "not_paid",
+    "pending",
+    "other"
+  ],
+  "item": [
+    [
+      "Bułka z kurczakiem",
+      4.49,
+      "Bułka z panierowanym kurczakiem, roztopionym żółtym serem, sosem sri-racha, cebulą, sałatą oraz ogórkiem konserwowym.",
+      "https://images.squarespace-cdn.com/content/v1/5e3c82ffe7c17442242aa62e/1583706481591-03GQJI3MPYVM0HWBF308/Buffalo+Chicken+Burger.png"
+    ],
+    [
+      "Bagietka czosnkowa",
+      2.49,
+      "Chrupiąca bagietka z masłem czosnkowym.",
+      "https://aryzta.pl/img/towary/1/2020_09/produkty-katalog-bagietki-bagietka-z-maslem-czosnkowym.png"
+    ],
+    [
+      "Drożdżówka z serem",
+      3.29,
+      "Drożdżówka z serem, kruszonką i lukrem.",
+      "https://fc-mwj.pl/app/uploads/2019/02/zestawienie_drozdzowka_kruszonka.png"
+    ],
+    [
+      "Cynamonowy zawijaniec",
+      3.49,
+      "Zawinięte drożdżowe ciastko z cynamonem, polane lukrem.",
+      "https://assets.stickpng.com/images/588278312c9eb99faafea883.png"
+    ],
+    [
+      "Bagietka z dodatkami",
+      7.49,
+      "Świeża bagietka z szynką, sałatą, pomidorem oraz serem.",
+      "https://www.pngitem.com/pimgs/m/365-3658180_blt-baguette-png-baguette-sandwich-png-transparent-png.png"
+    ]
+  ]
+}

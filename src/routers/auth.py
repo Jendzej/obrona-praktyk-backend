@@ -8,13 +8,13 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.exc import NoResultFound
 
-from main import engine, models
-from src.data_functions.data_fetch import fetch_user_by_username
+from main import models
+from src.data_functions.user import UserFunction
 from src.log import logger
 from src.models import TokenData, User, Token
 
 load_dotenv()
-
+user_functions = UserFunction()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 router = APIRouter(
@@ -55,7 +55,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def get_user(username: str):
     try:
-        user = fetch_user_by_username(engine, model_of_user, username)
+        user = user_functions.get_by_username(username)
     except NoResultFound:
         logger.error(f"No result found, HTTP_400_BAD_REQUEST - This username does not exist '{username}'")
         raise HTTPException(
