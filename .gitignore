@@ -1,0 +1,6 @@
+.env
+Pipfile.lock
+.idea/
+data/
+logs/
+test.py
