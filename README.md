@@ -12,7 +12,7 @@ This is backend of web application project - store with snacks and sandwiches wi
 
 > ## Technologies, functions and demo
 
-### Technologies
+## Technologies
 
 Backend of bun-car site - project for school was created with **_Python (3.10)_** and modules like:
 
@@ -21,7 +21,7 @@ Backend of bun-car site - project for school was created with **_Python (3.10)_*
 
 To store client data, transactions, items and other, I am using postgresql database.
 
-### How it works?
+## How it works?
 
 Using Python module FastAPI, I created REST API for backend of my web application. To access database queries I designed specific endpoints, from which I can fetch and send data in my [frontend](https://github.com/Jendzej/obrona-praktyk-frontend).
 
@@ -50,58 +50,36 @@ In above examples You can see some type of endpoints visualisation, which actual
 In this project you can find logger - it's not actually this what it should be. It just saves some useless info about running server and events; I didn't use it's potential.
 
 ---
-## Starting
+> ## Starting
+> How to start and setup backend
 
-To start this part of project you must run database (for example locally on docker or somewhere on web) and specify database data in _.env_ file created on the [.env.example pattern](/.env.example).
+To start this part of project, firstly, you must run database (for example locally on docker or somewhere on web).
 
-___
+While database is running, You can set up all environment variables in **_.env_** file on [.env.example pattern](/.env.example).
 
-### Baza danych
+|          Variable           | Description                                                                                                                            |
+|:---------------------------:|----------------------------------------------------------------------------------------------------------------------------------------|
+|         POSTGRES_DB         | Name of database                                                                                                                       |
+|        POSTGRES_USER        | Username to postgres administrator                                                                                                     |
+|      POSTGRES_PASSWORD      | Password to postgres administrator                                                                                                     |
+|        POSTGRES_HOST        | IP of database host                                                                                                                    |
+|        POSTGRES_PORT        | Port of database host                                                                                                                  |
+|         SECRET_KEY          | Secret key used to data encryption (32bytes hex string ([OpenSSL docs](https://www.openssl.org/docs/man1.0.2/man1/openssl-rand.html))) |
+|          ALGORITHM          | Algorithm used for data encryption (HS256)                                                                                             |
+| ACCESS_TOKEN_EXPIRE_MINUTES | Time to JWT token expiry                                                                                                               |
+|     PAGE_ADMIN_USERNAME     | Username to admin account (user which is created on startup with admin role)                                                           |
+|     PAGE_ADMIN_PASSWORD     | Password to admin account                                                                                                              |
+|      PAGE_ADMIN_EMAIL       | Admin account email                                                                                                                    |
 
-By uruchomić projekt lokalnie (przy użyciu Docker'a) należy zbudować obraz bazy danych używając poniższej komendy w
-katalogu projektu:
+If you have filled-up **_.env_** file, You must install python packages:
 
 ```commandline
-docker compose up -d --build
+pip install -r requirements.txt
 ```
 
-Po postawieniu bazy danych należy zamienić plik *pg_hba.conf*, który znajduje się w ./data/db, na ten znajdujący się w
-katalogu ./src.
-
-Po podmianie plików należy zrestartować kontener z bazą danych:
-
+... And then (finally), You can run backend:
 ```commandline
-docker compose restart
+python main.py
 ```
 
-___
-
-### Backend
-
-Backend projektu należy uruchomić po uruchomieniu bazy danych.
-
-## Commands
-
-```
-pipenv requirements > requirements.txt
-```
-
-Secret Key generation:
-
-```
-openssl rand -hex 32
-```
-
-1e1f5f612db705ab5f0fd2a1a8c91a03e3fa86fe28389a9393d8de8a748734b1
-
-Start Database:
-
-```
-bash start_db.sh
-```
-
-Stop Database:
-
-```
-bash stop_db.sh
-```
+Now REST API should be available on localhost or server IP on port 8000 http://127.0.0.1:8000.
